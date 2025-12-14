@@ -6,111 +6,117 @@ Write a Program to implement Prim's algorithm to find minimum spanning tree of a
 ## Code
 
 ```cpp
-#include <iostream>
+#include <iostream.h>
+#include <conio.h>
+
+#define MAX 20
 #define INF 9999
-using namespace std;
 
-struct Node {
-    int vertex;
-    int weight;
-    Node* next;
+struct Node
+{
+    int v;
+    int w;
+    Node *next;
 };
 
-class Graph {
-    int V;
-    Node* adjList[20];
+Node *adj[MAX];
+int V;
 
-public:
-    Graph(int v) {
-        V = v;
-        for (int i = 0; i < V; i++) {
-            adjList[i] = NULL;
-        }
+/* Add edge (undirected graph) */
+void addEdge(int u, int v, int w)
+{
+    Node *t = new Node;
+    t->v = v;
+    t->w = w;
+    t->next = adj[u];
+    adj[u] = t;
+
+    t = new Node;
+    t->v = u;
+    t->w = w;
+    t->next = adj[v];
+    adj[v] = t;
+}
+
+/* Prim's Algorithm */
+void primMST()
+{
+    int parent[MAX], key[MAX], mst[MAX];
+    int i, count, u, min, total = 0;
+
+    for (i = 0; i < V; i++)
+    {
+        key[i] = INF;
+        mst[i] = 0;
     }
 
-    void addEdge(int src, int dest, int weight) {
-        Node* newNode = new Node();
-        newNode->vertex = dest;
-        newNode->weight = weight;
-        newNode->next = adjList[src];
-        adjList[src] = newNode;
+    key[0] = 0;
+    parent[0] = -1;
 
-        newNode = new Node();
-        newNode->vertex = src;
-        newNode->weight = weight;
-        newNode->next = adjList[dest];
-        adjList[dest] = newNode;
-    }
-
-    void primMST() {
-        int parent[20], key[20];
-        bool inMST[20];
-
-        for (int i = 0; i < V; i++) {
-            key[i] = INF;
-            inMST[i] = false;
-        }
-
-        key[0] = 0;
-        parent[0] = -1;
-
-        for (int count = 0; count < V - 1; count++) {
-            // Pick minimum key vertex not yet in MST
-            int min = INF, u;
-
-            for (int i = 0; i < V; i++) {
-                if (!inMST[i] && key[i] < min) {
-                    min = key[i];
-                    u = i;
-                }
-            }
-
-            inMST[u] = true;
-
-            Node* temp = adjList[u];
-            while (temp != NULL) {
-                int v = temp->vertex;
-                int w = temp->weight;
-
-                if (!inMST[v] && w < key[v]) {
-                    key[v] = w;
-                    parent[v] = u;
-                }
-                temp = temp->next;
+    for (count = 0; count < V - 1; count++)
+    {
+        min = INF;
+        for (i = 0; i < V; i++)
+        {
+            if (mst[i] == 0 && key[i] < min)
+            {
+                min = key[i];
+                u = i;
             }
         }
 
-        cout << "\nEdges in Minimum Spanning Tree:\n";
-        int total = 0;
-        for (int i = 1; i < V; i++) {
-            cout << parent[i] << " - " << i << " Weight: " << key[i] << endl;
-            total += key[i];
-        }
-        cout << "Total Minimum Cost = " << total << endl;
-    }
-};
+        mst[u] = 1;
 
-int main() {
-    int v, e, src, dest, weight;
+        Node *p = adj[u];
+        while (p != NULL)
+        {
+            if (mst[p->v] == 0 && p->w < key[p->v])
+            {
+                key[p->v] = p->w;
+                parent[p->v] = u;
+            }
+            p = p->next;
+        }
+    }
+
+    cout << "\nEdges in Minimum Spanning Tree:\n";
+    for (i = 1; i < V; i++)
+    {
+        cout << parent[i] << " - " << i
+             << "   Weight: " << key[i] << endl;
+        total += key[i];
+    }
+
+    cout << "Total Minimum Cost = " << total << endl;
+}
+
+/* MAIN */
+void main()
+{
+    int e, u, v, w, i;
+    clrscr();
 
     cout << "Enter number of vertices: ";
-    cin >> v;
+    cin >> V;
 
-    Graph g(v);
+    for (i = 0; i < V; i++)
+        adj[i] = NULL;
 
     cout << "Enter number of edges: ";
     cin >> e;
 
-    for (int i = 0; i < e; i++) {
-        cout << "Enter edge (source destination weight): ";
-        cin >> src >> dest >> weight;
-        g.addEdge(src, dest, weight);
+    for (i = 0; i < e; i++)
+    {
+        cout << "Enter edge (u v weight): ";
+        cin >> u >> v >> w;
+        addEdge(u, v, w);
     }
 
-    g.primMST();
+    primMST();
 
-    return 0;
+    getch();
 }
+
 ```
 
 ## Output
