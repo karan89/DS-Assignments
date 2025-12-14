@@ -6,127 +6,85 @@ You are given a postfix expression (also known as Reverse Polish Notation) consi
 ## Code
 
 ```cpp
-#include <iostream>
-#include <string>
-#include <cctype>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
+#include <ctype.h>   // for isdigit
 
-typedef struct node {
-    int val;
-    struct node* next;
-} STACK;
+/* Node structure */
+struct Node
+{
+    int data;
+    Node *next;
+};
 
-// push value onto stack (returns new top)
-STACK* push(STACK* top, int v) {
-    STACK* n = new STACK;
-    n->val = v;
-    n->next = top;
-    return n;
+/* Stack top */
+Node *top = NULL;
+
+/* Push */
+void push(int x)
+{
+    Node *t = new Node;
+    t->data = x;
+    t->next = top;
+    top = t;
 }
 
-// pop value; sets popped, returns new top. If stack empty, sets poppedFlag false.
-STACK* pop(STACK* top, int &popped, bool &poppedFlag) {
-    if (!top) { poppedFlag = false; return NULL; }
-    STACK* tmp = top;
-    popped = top->val;
-    poppedFlag = true;
-    top = top->next;
-    delete tmp;
-    return top;
+/* Pop */
+int pop()
+{
+    Node *t;
+    int x;
+
+    if (top == NULL)
+        return 0;
+
+    t = top;
+    x = t->data;
+    top = t->next;
+    delete t;
+    return x;
 }
 
-// peek top value (assumes non-empty)
-int peek(STACK* top) {
-    return top->val;
-}
+/* -------- MAIN -------- */
+void main()
+{
+    char postfix[50];
+    int i;
+    char ch;
+    int a, b, result;
 
-// IsEmpty
-bool isEmpty(STACK* top) {
-    return top == NULL;
-}
+    clrscr();
 
-// free stack
-void freeStack(STACK* top) {
-    while (top) {
-        STACK* t = top;
-        top = top->next;
-        delete t;
-    }
-}
+    cout << "Enter postfix expression: ";
+    cin >> postfix;
 
-int main() {
-    cout << "Enter postfix expression (single-digit operands, operators + - * /), e.g. 231*+9-:\n";
-    string expr;
-    if (!getline(cin, expr)) return 0;
-    
-    // remove spaces if user entered spaces-separated expression
-    string s;
-    for (char c : expr) if (!isspace((unsigned char)c)) s.push_back(c);
+    for (i = 0; postfix[i] != '\0'; i++)
+    {
+        ch = postfix[i];
 
-    STACK* top = NULL;
-    bool error = false;
-    string errmsg;
-
-    for (size_t i = 0; i < s.size(); ++i) {
-        char c = s[i];
-
-        if (c >= '0' && c <= '9') {
-            int val = c - '0';
-            top = push(top, val);
+        /* Operand */
+        if (isdigit(ch))
+        {
+            push(ch - '0');
         }
-        else if (c == '+' || c == '-' || c == '*' || c == '/') {
-            // need two operands
-            int b, a;
-            bool ok;
-            
-            top = pop(top, b, ok);
-            if (!ok) { error = true; errmsg = "Error: insufficient operands (missing second operand)."; break; }
-            
-            top = pop(top, a, ok);
-            if (!ok) { error = true; errmsg = "Error: insufficient operands (missing first operand)."; break; }
-            
-            int res = 0;
-            if (c == '+') res = a + b;
-            else if (c == '-') res = a - b;
-            else if (c == '*') res = a * b;
-            else if (c == '/') {
-                if (b == 0) { error = true; errmsg = "Error: division by zero."; break; }
-                res = a / b; // integer division
-            }
-            top = push(top, res);
-        }
-        else {
-            error = true;
-            errmsg = string("Error: invalid character '") + c + "' in expression.";
-            break;
+        /* Operator */
+        else
+        {
+            b = pop();
+            a = pop();
+
+            if (ch == '+') result = a + b;
+            else if (ch == '-') result = a - b;
+            else if (ch == '*') result = a * b;
+            else if (ch == '/') result = a / b;
+
+            push(result);
         }
     }
 
-    if (!error) {
-        // final result: stack should have exactly one value
-        int finalval;
-        bool ok;
-        top = pop(top, finalval, ok);
-        
-        if (!ok) {
-            cout << "Error: empty expression or no operands.\n";
-            freeStack(top);
-            return 0;
-        }
-        
-        if (!isEmpty(top)) {
-            // extra operands remain -> invalid postfix
-            cout << "Error: malformed expression extra operands remain.\n";
-            freeStack(top);
-            return 0;
-        }
-        cout << "Result: " << finalval << "\n";
-    } else {
-        cout << errmsg << "\n";
-    }
+    cout << "Result = " << pop();
 
-    freeStack(top);
-    return 0;
+    getch();
 }
 ```
 
