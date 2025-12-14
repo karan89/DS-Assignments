@@ -6,78 +6,100 @@ Implement collision handling using separate chaining.
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
 
-#define SIZE 10
-
-// Node for Linked List
-struct Node {
+struct Node
+{
     int data;
-    Node* next;
+    Node *next;
 };
 
-// Hash table array of pointers
-Node* table[SIZE];
+Node *table[20];
+int SIZE;
 
-// Hash function
-int hashFunction(int key) {
+/* Hash Function */
+int hashFunc(int key)
+{
     return key % SIZE;
 }
 
-// Insert using Separate Chaining
-void insert(int key) {
-    int index = hashFunction(key);
-    
-    Node* newNode = new Node();
-    newNode->data = key;
-    newNode->next = NULL;
+/* Insert Key */
+void insertKey(int key)
+{
+    int index = hashFunc(key);
 
-    // If no node exists
-    if (table[index] == NULL) {
-        table[index] = newNode;
-    } else {
-        // Add at beginning of linked list
-        newNode->next = table[index];
-        table[index] = newNode;
+    Node *t = new Node;
+    t->data = key;
+    t->next = NULL;
+
+    if (table[index] == NULL)
+        table[index] = t;
+    else
+    {
+        Node *p = table[index];
+        while (p->next != NULL)
+            p = p->next;
+        p->next = t;
     }
 }
 
-// Display hash table
-void display() {
-    cout << "\nHash Table with Separate Chaining: \n";
-    for(int i = 0; i < SIZE; i++) {
+/* Display Hash Table */
+void display()
+{
+    int i;
+    cout << "\nHash Table:\n";
+    for (i = 0; i < SIZE; i++)
+    {
         cout << i << " -> ";
-        Node* temp = table[i];
-        while(temp != NULL) {
-            cout << temp->data << " -> ";
-            temp = temp->next;
+        Node *p = table[i];
+        while (p != NULL)
+        {
+            cout << p->data << " -> ";
+            p = p->next;
         }
-        cout << "NULL" << endl;
+        cout << "NULL\n";
     }
 }
 
-int main() {
-    int n, key;
+/* MAIN */
+void main()
+{
+    int ch, key, i;
+    clrscr();
 
-    // Initialize table
-    for(int i = 0; i < SIZE; i++) {
+    cout << "Enter Hash Table Size (max 20): ";
+    cin >> SIZE;
+
+    for (i = 0; i < SIZE; i++)
         table[i] = NULL;
-    }
 
-    cout << "Enter number of elements: ";
-    cin >> n;
+    do
+    {
+        cout << "\n--- HASH TABLE MENU ---\n";
+        cout << "1. Insert\n";
+        cout << "2. Display\n";
+        cout << "3. Exit\n";
+        cout << "Enter choice: ";
+        cin >> ch;
 
-    cout << "Enter elements:\n";
-    for(int i = 0; i < n; i++) {
-        cin >> key;
-        insert(key);
-    }
+        switch (ch)
+        {
+        case 1:
+            cout << "Enter key: ";
+            cin >> key;
+            insertKey(key);
+            break;
 
-    display();
+        case 2:
+            display();
+            break;
+        }
+    } while (ch != 3);
 
-    return 0;
+    getch();
 }
+
 ```
 
 ## Output
