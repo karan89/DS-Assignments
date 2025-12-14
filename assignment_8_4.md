@@ -6,220 +6,146 @@ Implement product inventory management using a search tree.
 ## Code
 
 ```cpp
-#include <iostream>
-#include <string>
-#include <ctime>
-#include <cstdio>
-#include <limits>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
+#include <string.h>
 
-typedef struct date {
-    int y, m, d;
-} Date;
-
-typedef struct product {
-    string code;
-    string name;
-    double price;
+struct Product
+{
+    int code;
+    char name[20];
+    float price;
     int qty;
-    Date received;
-    Date expiry;
-    struct product* left;
-    struct product* right;
-} PNode;
+    int recvDate;
+    int expDate;
+    Product *left, *right;
+};
 
-bool parseDate(const string &s, Date &dt) {
-    if (s.size() < 8) return false;
-    int y, m, d;
-    if (sscanf(s.c_str(), "%d-%d-%d", &y, &m, &d) == 3) {
-        dt.y = y; dt.m = m; dt.d = d;
-        return true;
+Product *root = NULL;
+
+/* Create product node */
+Product* createNode(int c, char n[], float p, int q, int r, int e)
+{
+    Product *t = new Product;
+    t->code = c;
+    strcpy(t->name, n);
+    t->price = p;
+    t->qty = q;
+    t->recvDate = r;
+    t->expDate = e;
+    t->left = t->right = NULL;
+    return t;
+}
+
+/* Insert product (BST by name) */
+Product* insert(Product *r, int c, char n[], float p, int q, int rd, int ed)
+{
+    if (r == NULL)
+        return createNode(c, n, p, q, rd, ed);
+
+    if (strcmp(n, r->name) < 0)
+        r->left = insert(r->left, c, n, p, q, rd, ed);
+    else
+        r->right = insert(r->right, c, n, p, q, rd, ed);
+
+    return r;
+}
+
+/* Inorder traversal (all products sorted by name) */
+void inorder(Product *r)
+{
+    if (r != NULL)
+    {
+        inorder(r->left);
+        cout << "\nCode: " << r->code;
+        cout << "\nName: " << r->name;
+        cout << "\nPrice: " << r->price;
+        cout << "\nQuantity: " << r->qty;
+        cout << "\nReceived Date: " << r->recvDate;
+        cout << "\nExpiry Date: " << r->expDate;
+        cout << "\n-------------------------";
+        inorder(r->right);
     }
-    return false;
 }
 
-Date getSystemDate() {
-    time_t t = time(NULL);
-    tm* now = localtime(&t);
-    Date d;
-    d.y = now->tm_year + 1900;
-    d.m = now->tm_mon + 1;
-    d.d = now->tm_mday;
-    return d;
-}
-
-int compareDate(const Date &a, const Date &b) {
-    if (a.y < b.y) return -1;
-    if (a.y > b.y) return 1;
-    if (a.m < b.m) return -1;
-    if (a.m > b.m) return 1;
-    if (a.d < b.d) return -1;
-    if (a.d > b.d) return 1;
-    return 0;
-}
-
-string dateToString(const Date &dt) {
-    char buf[16];
-    sprintf(buf, "%04d-%02d-%02d", dt.y, dt.m, dt.d);
-    return string(buf);
-}
-
-PNode* createProductNode(const string &code, const string &name, double price, int qty, const Date &rec, const Date &exp) {
-    PNode* p = new PNode;
-    p->code = code;
-    p->name = name;
-    p->price = price;
-    p->qty = qty;
-    p->received = rec;
-    p->expiry = exp;
-    p->left = p->right = NULL;
-    return p;
-}
-
-PNode* insertProduct(PNode* root, PNode* node) {
-    if (!node) return root;
-    if (!root) return node;
-    
-    // Sort by name as per assignment instructions implies "inorder sorted by name"
-    if (node->name < root->name) {
-        root->left = insertProduct(root->left, node);
-    } else if (node->name > root->name) {
-        root->right = insertProduct(root->right, node);
-    } else {
-        cout << "Product with name '" << node->name << "' already exists. Insert rejected.\n";
-        delete node;
+/* Preorder traversal for expired products */
+void expired(Product *r, int current)
+{
+    if (r != NULL)
+    {
+        if (r->expDate < current)
+        {
+            cout << "\nEXPIRED PRODUCT";
+            cout << "\nCode: " << r->code;
+            cout << "\nName: " << r->name;
+            cout << "\nExpiry Date: " << r->expDate;
+            cout << "\n-------------------------";
+        }
+        expired(r->left, current);
+        expired(r->right, current);
     }
-    return root;
 }
 
-void inorderDisplay(PNode* root) {
-    if (!root) return;
-    inorderDisplay(root->left);
-    cout << "Product Code : " << root->code << "\n";
-    cout << "Name         : " << root->name << "\n";
-    cout << "Price        : " << root->price << "\n";
-    cout << "Quantity     : " << root->qty << "\n";
-    cout << "Received     : " << dateToString(root->received) << "\n";
-    cout << "Expiry       : " << dateToString(root->expiry) << "\n";
-    cout << "-----------------\n";
-    inorderDisplay(root->right);
-}
+/* MAIN */
+void main()
+{
+    int ch;
+    int code, qty, rd, ed, today;
+    char name[20];
+    float price;
+    clrscr();
 
-void preorderListExpired(PNode* root, const Date &current) {
-    if (!root) return;
-    
-    if (compareDate(root->expiry, current) < 0) {
-        cout << "Product Code : " << root->code << "\n";
-        cout << "Name         : " << root->name << "\n";
-        cout << "Price        : " << root->price << "\n";
-        cout << "Quantity     : " << root->qty << "\n";
-        cout << "Received     : " << dateToString(root->received) << "\n";
-        cout << "Expiry       : " << dateToString(root->expiry) << " (EXPIRED)\n";
-        cout << "-----------------\n";
-    }
-    preorderListExpired(root->left, current);
-    preorderListExpired(root->right, current);
-}
-
-void freeTree(PNode* root) {
-    if (!root) return;
-    freeTree(root->left);
-    freeTree(root->right);
-    delete root;
-}
-
-PNode* readProductFromUser() {
-    string code, name, srec, sexp;
-    double price;
-    int qty;
-    
-    cout << "Enter product code: ";
-    cin >> ws;
-    getline(cin, code);
-    if (code.empty()) { cout << "Product code required.\n"; return NULL; }
-    
-    cout << "Enter product name: ";
-    getline(cin, name);
-    if (name.empty()) { cout << "Product name required.\n"; return NULL; }
-    
-    cout << "Enter price: ";
-    if (!(cin >> price)) { cin.clear(); cin.ignore(10000, '\n'); cout << "Invalid price.\n"; return NULL; }
-    
-    cout << "Enter quantity in stock (integer): ";
-    if (!(cin >> qty)) { cin.clear(); cin.ignore(10000, '\n'); cout << "Invalid quantity.\n"; return NULL; }
-    cin.ignore(10000, '\n');
-    
-    cout << "Enter date received (YYYY-MM-DD): ";
-    getline(cin, srec);
-    Date rec;
-    if (!parseDate(srec, rec)) { cout << "Invalid date format. Use YYYY-MM-DD.\n"; return NULL; }
-    
-    cout << "Enter expiration date (YYYY-MM-DD): ";
-    getline(cin, sexp);
-    Date exp;
-    if (!parseDate(sexp, exp)) { cout << "Invalid date format. Use YYYY-MM-DD.\n"; return NULL; }
-    
-    return createProductNode(code, name, price, qty, rec, exp);
-}
-
-int main() {
-    PNode* root = NULL;
-    int choice;
-    cout << "=== Product Inventory (BST keyed by Product Name) ===\n";
-    
-    do {
-        cout << "\nMenu:\n";
-        cout << "1. Insert a product\n";
-        cout << "2. Display all items (inorder sorted by name)\n";
-        cout << "3. List expired items (preorder of names)\n";
+    do
+    {
+        cout << "\n--- PRODUCT INVENTORY MENU ---\n";
+        cout << "1. Insert Product\n";
+        cout << "2. Display All Products\n";
+        cout << "3. Display Expired Products\n";
         cout << "4. Exit\n";
         cout << "Enter choice: ";
-        if (!(cin >> choice)) { cin.clear(); cin.ignore(10000, '\n'); cout << "Invalid choice.\n"; continue; }
-        cin.ignore(10000, '\n');
+        cin >> ch;
 
-        if (choice == 1) {
-            PNode* node = readProductFromUser();
-            if (node) {
-                root = insertProduct(root, node);
-                cout << "Product inserted.\n";
+        switch (ch)
+        {
+        case 1:
+            cout << "Enter Product Code: ";
+            cin >> code;
+            cout << "Enter Product Name: ";
+            cin >> name;
+            cout << "Enter Price: ";
+            cin >> price;
+            cout << "Enter Quantity: ";
+            cin >> qty;
+            cout << "Enter Received Date (YYYYMMDD): ";
+            cin >> rd;
+            cout << "Enter Expiry Date (YYYYMMDD): ";
+            cin >> ed;
+
+            root = insert(root, code, name, price, qty, rd, ed);
+            cout << "Product inserted.\n";
+            break;
+
+        case 2:
+            if (root == NULL)
+                cout << "No products in inventory.\n";
+            else
+                inorder(root);
+            break;
+
+        case 3:
+            if (root == NULL)
+            {
+                cout << "No products in inventory.\n";
+                break;
             }
+            cout << "Enter current date (YYYYMMDD): ";
+            cin >> today;
+            expired(root, today);
+            break;
         }
-        else if (choice == 2) {
-            if (!root) cout << "(No products in inventory)\n";
-            else {
-                cout << "\nInventory (sorted by product name):\n";
-                inorderDisplay(root);
-            }
-        }
-        else if (choice == 3) {
-            if (!root) { cout << "No products in inventory.\n"; continue; }
-            cout << "Enter current date (YYYY-MM-DD) or press Enter to use system date: ";
-            string curline;
-            getline(cin, curline);
-            Date current;
-            
-            if (curline.empty()) {
-                current = getSystemDate();
-                cout << "Using system date: " << dateToString(current) << "\n";
-            } else {
-                if (!parseDate(curline, current)) {
-                    cout << "Invalid date format. Use YYYY-MM-DD.\n";
-                    continue;
-                }
-            }
-            cout << "\nExpired items (preorder by name):\n";
-            preorderListExpired(root, current);
-        }
-        else if (choice == 4) {
-            cout << "Exiting. Freeing memory.\n";
-            freeTree(root);
-        }
-        else {
-            cout << "Invalid choice.\n";
-        }
-    } while (choice != 4);
-    
-    return 0;
+    } while (ch != 4);
+
+    getch();
 }
 ```
 
