@@ -6,156 +6,176 @@ WAP to simulate student databases as a hash table. a student database management
 ## Code
 
 ```cpp
-#include <iostream>
-#include <string>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
+#include <string.h>
 
 #define SIZE 10
 
-// Node structure for Linked List
-struct Student {
+struct Student
+{
     int roll;
-    string name;
-    string course;
-    Student* next;
+    char name[20];
+    char course[20];
+    Student *next;
 };
 
-// Hash Table
-Student* hashTable[SIZE];
+Student *hashTable[SIZE];
 
-// Hash Function (MOD)
-int hashFunction(int key) {
-    return key % SIZE;
+/* Hash Function */
+int hashFunction(int roll)
+{
+    return roll % SIZE;
 }
 
-// Create new node
-Student* createNode(int roll, string name, string course) {
-    Student* temp = new Student;
-    temp->roll = roll;
-    temp->name = name;
-    temp->course = course;
-    temp->next = NULL;
-    return temp;
+/* Create Node */
+Student* createNode(int roll, char name[], char course[])
+{
+    Student *t = new Student;
+    t->roll = roll;
+    strcpy(t->name, name);
+    strcpy(t->course, course);
+    t->next = NULL;
+    return t;
 }
 
-// Insert Student
-void insertStudent(int roll, string name, string course) {
+/* Insert Student */
+void insertStudent(int roll, char name[], char course[])
+{
     int index = hashFunction(roll);
-    Student* newNode = createNode(roll, name, course);
+    Student *t = createNode(roll, name, course);
 
-    if (hashTable[index] == NULL) {
-        hashTable[index] = newNode;
-    } else {
-        Student* ptr = hashTable[index];
-        while (ptr->next != NULL) {
-            ptr = ptr->next;
-        }
-        ptr->next = newNode;
+    if (hashTable[index] == NULL)
+        hashTable[index] = t;
+    else
+    {
+        Student *p = hashTable[index];
+        while (p->next != NULL)
+            p = p->next;
+        p->next = t;
     }
-    cout << "\nStudent Inserted Successfully!\n";
+    cout << "Student inserted successfully.\n";
 }
 
-// Search Student
-void searchStudent(int roll) {
+/* Search Student */
+void searchStudent(int roll)
+{
     int index = hashFunction(roll);
-    Student* ptr = hashTable[index];
+    Student *p = hashTable[index];
 
-    while (ptr != NULL) {
-        if (ptr->roll == roll) {
-            cout << "\nStudent Found!\n";
-            cout << "Roll No: " << ptr->roll << endl;
-            cout << "Name: " << ptr->name << endl;
-            cout << "Course: " << ptr->course << endl;
+    while (p != NULL)
+    {
+        if (p->roll == roll)
+        {
+            cout << "\nStudent Found\n";
+            cout << "Roll No : " << p->roll << endl;
+            cout << "Name    : " << p->name << endl;
+            cout << "Course  : " << p->course << endl;
             return;
         }
-        ptr = ptr->next;
+        p = p->next;
     }
-    cout << "\nStudent Not Found!\n";
+    cout << "Student not found.\n";
 }
 
-// Delete Student
-void deleteStudent(int roll) {
+/* Delete Student */
+void deleteStudent(int roll)
+{
     int index = hashFunction(roll);
-    Student* ptr = hashTable[index];
-    Student* prev = NULL;
+    Student *p = hashTable[index];
+    Student *prev = NULL;
 
-    while (ptr != NULL) {
-        if (ptr->roll == roll) {
-            if (prev == NULL) {
-                hashTable[index] = ptr->next;
-            } else {
-                prev->next = ptr->next;
-            }
-            delete ptr;
-            cout << "\nStudent Record Deleted Successfully!\n";
+    while (p != NULL)
+    {
+        if (p->roll == roll)
+        {
+            if (prev == NULL)
+                hashTable[index] = p->next;
+            else
+                prev->next = p->next;
+
+            delete p;
+            cout << "Student deleted successfully.\n";
             return;
         }
-        prev = ptr;
-        ptr = ptr->next;
+        prev = p;
+        p = p->next;
     }
-    cout << "\nStudent Not Found!\n";
+    cout << "Student not found.\n";
 }
 
-// Display Hash Table
-void display() {
+/* Display Hash Table */
+void display()
+{
+    int i;
     cout << "\n--- Student Hash Table ---\n";
-    for (int i = 0; i < SIZE; i++) {
+    for (i = 0; i < SIZE; i++)
+    {
         cout << i << " -> ";
-        Student* ptr = hashTable[i];
-        while (ptr != NULL) {
-            cout << "[" << ptr->roll << "," << ptr->name << "] -> ";
-            ptr = ptr->next;
+        Student *p = hashTable[i];
+        while (p != NULL)
+        {
+            cout << "[" << p->roll << ", " << p->name << "] -> ";
+            p = p->next;
         }
         cout << "NULL\n";
     }
 }
 
-int main() {
-    int choice, roll;
-    string name, course;
+/* MAIN */
+void main()
+{
+    int i, ch, roll;
+    char name[20], course[20];
+    clrscr();
 
-    for (int i = 0; i < SIZE; i++) {
+    for (i = 0; i < SIZE; i++)
         hashTable[i] = NULL;
-    }
 
-    do {
-        cout << "\n--- Student Database Menu ---\n";
+    do
+    {
+        cout << "\n--- STUDENT DATABASE MENU ---\n";
         cout << "1. Insert Student\n";
         cout << "2. Search Student\n";
         cout << "3. Delete Student\n";
         cout << "4. Display Hash Table\n";
         cout << "5. Exit\n";
-        cout << "Enter your choice: ";
-        cin >> choice;
+        cout << "Enter choice: ";
+        cin >> ch;
 
-        switch (choice) {
-            case 1:
-                cout << "Enter Roll No: ";
-                cin >> roll;
-                cout << "Enter Name: ";
-                cin >> name;
-                cout << "Enter Course: ";
-                cin >> course;
-                insertStudent(roll, name, course);
-                break;
-            case 2:
-                cout << "Enter Roll No to Search: ";
-                cin >> roll;
-                searchStudent(roll);
-                break;
-            case 3:
-                cout << "Enter Roll No to Delete: ";
-                cin >> roll;
-                deleteStudent(roll);
-                break;
-            case 4:
-                display();
-                break;
+        switch (ch)
+        {
+        case 1:
+            cout << "Enter Roll No: ";
+            cin >> roll;
+            cout << "Enter Name: ";
+            cin >> name;
+            cout << "Enter Course: ";
+            cin >> course;
+            insertStudent(roll, name, course);
+            break;
+
+        case 2:
+            cout << "Enter Roll No to search: ";
+            cin >> roll;
+            searchStudent(roll);
+            break;
+
+        case 3:
+            cout << "Enter Roll No to delete: ";
+            cin >> roll;
+            deleteStudent(roll);
+            break;
+
+        case 4:
+            display();
+            break;
         }
-    } while (choice != 5);
+    } while (ch != 5);
 
-    return 0;
+    getch();
 }
+
 ```
 
 ## Output
