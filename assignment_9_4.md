@@ -6,111 +6,116 @@ Write a Program to implement Dijkstra's algorithm to find shortest distance betw
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
 
+#define MAX 20
 #define INF 9999
 
-struct Node {
-    int vertex;
-    int weight;
-    Node* next;
+struct Node
+{
+    int v;
+    int w;
+    Node *next;
 };
 
-class Graph {
-    int V;
-    Node* adjList[20];
+Node *adj[MAX];
+int V;
 
-public:
-    Graph(int v) {
-        V = v;
-        for (int i = 0; i < V; i++) {
-            adjList[i] = NULL;
-        }
+/* Add edge (undirected weighted graph) */
+void addEdge(int u, int v, int w)
+{
+    Node *t = new Node;
+    t->v = v;
+    t->w = w;
+    t->next = adj[u];
+    adj[u] = t;
+
+    t = new Node;
+    t->v = u;
+    t->w = w;
+    t->next = adj[v];
+    adj[v] = t;
+}
+
+/* Dijkstra Algorithm */
+void dijkstra(int start, int end)
+{
+    int dist[MAX], visited[MAX];
+    int i, count, u, min;
+
+    for (i = 0; i < V; i++)
+    {
+        dist[i] = INF;
+        visited[i] = 0;
     }
 
-    void addEdge(int src, int dest, int weight) {
-        Node* newNode = new Node();
-        newNode->vertex = dest;
-        newNode->weight = weight;
-        newNode->next = adjList[src];
-        adjList[src] = newNode;
+    dist[start] = 0;
 
-        newNode = new Node();
-        newNode->vertex = src;
-        newNode->weight = weight;
-        newNode->next = adjList[dest];
-        adjList[dest] = newNode;
-    }
-
-    void dijkstra(int start, int end) {
-        int dist[20];
-        bool visited[20];
-
-        for (int i = 0; i < V; i++) {
-            dist[i] = INF;
-            visited[i] = false;
-        }
-
-        dist[start] = 0;
-
-        for (int count = 0; count < V - 1; count++) {
-            // Find vertex with min distance not yet processed
-            int min = INF, u;
-
-            for (int i = 0; i < V; i++) {
-                if (!visited[i] && dist[i] < min) {
-                    min = dist[i];
-                    u = i;
-                }
-            }
-
-            // Mark the picked vertex as processed
-            visited[u] = true;
-
-            // Update dist value of the adjacent vertices of the picked vertex
-            Node* temp = adjList[u];
-            while (temp != NULL) {
-                int v = temp->vertex;
-                int w = temp->weight;
-
-                if (!visited[v] && dist[u] + w < dist[v]) {
-                    dist[v] = dist[u] + w;
-                }
-                temp = temp->next;
+    for (count = 0; count < V - 1; count++)
+    {
+        min = INF;
+        for (i = 0; i < V; i++)
+        {
+            if (visited[i] == 0 && dist[i] < min)
+            {
+                min = dist[i];
+                u = i;
             }
         }
 
-        cout << "\nShortest distance from " << start << " to " << end << " = " << dist[end] << endl;
-    }
-};
+        visited[u] = 1;
 
-int main() {
-    int v, e, src, dest, weight, start, end;
+        Node *p = adj[u];
+        while (p != NULL)
+        {
+            if (visited[p->v] == 0 &&
+                dist[u] + p->w < dist[p->v])
+            {
+                dist[p->v] = dist[u] + p->w;
+            }
+            p = p->next;
+        }
+    }
+
+    cout << "\nShortest distance from "
+         << start << " to " << end
+         << " = " << dist[end] << endl;
+}
+
+/* MAIN */
+void main()
+{
+    int e, u, v, w, i, start, end;
+    clrscr();
 
     cout << "Enter number of vertices: ";
-    cin >> v;
+    cin >> V;
 
-    Graph g(v);
+    for (i = 0; i < V; i++)
+        adj[i] = NULL;
 
     cout << "Enter number of edges: ";
     cin >> e;
 
-    for (int i = 0; i < e; i++) {
-        cout << "Enter edge (source destination weight): ";
-        cin >> src >> dest >> weight;
-        g.addEdge(src, dest, weight);
+    for (i = 0; i < e; i++)
+    {
+        cout << "Enter edge (u v weight): ";
+        cin >> u >> v >> w;
+        addEdge(u, v, w);
     }
 
-    cout << "Enter starting node: ";
+    cout << "Enter starting vertex: ";
     cin >> start;
-    cout << "Enter destination node: ";
+
+    cout << "Enter destination vertex: ";
     cin >> end;
 
-    g.dijkstra(start, end);
+    dijkstra(start, end);
 
-    return 0;
+    getch();
 }
+
 ```
 
 ## Output
