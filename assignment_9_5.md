@@ -6,117 +6,119 @@ Write a Program to accept a graph from a user and represent it with Adjacency Li
 ## Code
 
 ```cpp
-#include <iostream>
-#include <queue>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
 
-struct Node {
+#define MAX 20
+
+struct Node
+{
     int vertex;
-    Node* next;
+    Node *next;
 };
 
-class Graph {
-    int V;
-    Node* adjList[20];
-    bool visited[20];
+Node *adj[MAX];
+int visited[MAX];
+int V;
 
-public:
-    Graph(int v) {
-        V = v;
-        for (int i = 0; i < V; i++) {
-            adjList[i] = NULL;
-            visited[i] = false;
-        }
-    }
+/* Add edge (Undirected Graph) */
+void addEdge(int u, int v)
+{
+    Node *t = new Node;
+    t->vertex = v;
+    t->next = adj[u];
+    adj[u] = t;
 
-    void addEdge(int src, int dest) {
-        Node* newNode = new Node();
-        newNode->vertex = dest;
-        newNode->next = adjList[src];
-        adjList[src] = newNode;
+    t = new Node;
+    t->vertex = u;
+    t->next = adj[v];
+    adj[v] = t;
+}
 
-        newNode = new Node();
-        newNode->vertex = src;
-        newNode->next = adjList[dest];
-        adjList[dest] = newNode;
-    }
+/* BFS using array queue */
+void BFS(int start)
+{
+    int queue[MAX];
+    int front = 0, rear = 0;
+    int i;
 
-    void BFS(int start) {
-        queue<int> q;
-        for (int i = 0; i < V; i++) {
-            visited[i] = false;
-        }
+    for (i = 0; i < V; i++)
+        visited[i] = 0;
 
-        visited[start] = true;
-        q.push(start);
+    visited[start] = 1;
+    queue[rear++] = start;
 
-        cout << "\nBFS Traversal: ";
+    cout << "\nBFS Traversal: ";
 
-        while (!q.empty()) {
-            int current = q.front();
-            q.pop();
-            cout << current << " ";
-
-            Node* temp = adjList[current];
-            while (temp != NULL) {
-                if (!visited[temp->vertex]) {
-                    visited[temp->vertex] = true;
-                    q.push(temp->vertex);
-                }
-                temp = temp->next;
-            }
-        }
-        cout << endl;
-    }
-
-    void DFSUtil(int v) {
-        visited[v] = true;
+    while (front < rear)
+    {
+        int v = queue[front++];
         cout << v << " ";
 
-        Node* temp = adjList[v];
-        while (temp != NULL) {
-            if (!visited[temp->vertex]) {
-                DFSUtil(temp->vertex);
+        Node *p = adj[v];
+        while (p != NULL)
+        {
+            if (!visited[p->vertex])
+            {
+                visited[p->vertex] = 1;
+                queue[rear++] = p->vertex;
             }
-            temp = temp->next;
+            p = p->next;
         }
     }
+}
 
-    void DFS(int start) {
-        for (int i = 0; i < V; i++) {
-            visited[i] = false;
-        }
-        cout << "\nDFS Traversal: ";
-        DFSUtil(start);
-        cout << endl;
+/* DFS using recursion */
+void DFS(int v)
+{
+    visited[v] = 1;
+    cout << v << " ";
+
+    Node *p = adj[v];
+    while (p != NULL)
+    {
+        if (!visited[p->vertex])
+            DFS(p->vertex);
+        p = p->next;
     }
-};
+}
 
-int main() {
-    int v, e, src, dest, start;
+/* MAIN */
+void main()
+{
+    int e, u, v, start, i;
+    clrscr();
 
     cout << "Enter number of vertices: ";
-    cin >> v;
+    cin >> V;
 
-    Graph g(v);
+    for (i = 0; i < V; i++)
+        adj[i] = NULL;
 
     cout << "Enter number of edges: ";
     cin >> e;
 
-    for (int i = 0; i < e; i++) {
-        cout << "Enter edge (source destination): ";
-        cin >> src >> dest;
-        g.addEdge(src, dest);
+    for (i = 0; i < e; i++)
+    {
+        cout << "Enter edge (u v): ";
+        cin >> u >> v;
+        addEdge(u, v);
     }
 
     cout << "Enter starting vertex: ";
     cin >> start;
 
-    g.BFS(start);
-    g.DFS(start);
+    BFS(start);
 
-    return 0;
+    for (i = 0; i < V; i++)
+        visited[i] = 0;
+
+    cout << "\nDFS Traversal: ";
+    DFS(start);
+
+    getch();
 }
+
 ```
 
 ## Output
