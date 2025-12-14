@@ -6,206 +6,105 @@ Write a program to perform Binary Search Tree (BST) operations (Create, Insert, 
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+/*Write a program to perform Binary Search Tree (BST) operations (Create, Insert, Delete,Levelwise display ) */
 
-typedef struct node {
-    int key;
-    struct node* left;
-    struct node* right;
-} BTNODE;
+#include <iostream.h>
+#include <conio.h>
 
-// create a new tree node
-BTNODE* createNode(int k) {
-    BTNODE* n = new BTNODE;
-    n->key = k;
-    n->left = n->right = NULL;
-    return n;
-}
+struct node {
+    int data;
+    node *left, *right;
+};
 
-// insert key into BST
-BTNODE* insertNode(BTNODE* root, int key) {
-    if (root == NULL) {
-        return createNode(key);
-    }
-    if (key < root->key) {
-        root->left = insertNode(root->left, key);
-    } else if (key > root->key) {
-        root->right = insertNode(root->right, key);
-    } else {
-        cout << "Key " << key << " already exists. Ignored.\n";
-    }
-    return root;
-}
-
-// find minimum node in subtree
-BTNODE* findMin(BTNODE* root) {
-    if (!root) return NULL;
-    while (root->left) root = root->left;
-    return root;
-}
-
-// delete a key from BST
-BTNODE* deleteNode(BTNODE* root, int key) {
-    if (!root) {
-        cout << "Key " << key << " not found.\n";
-        return NULL;
-    }
-
-    if (key < root->key) {
-        root->left = deleteNode(root->left, key);
-    } else if (key > root->key) {
-        root->right = deleteNode(root->right, key);
-    } else {
-        // Node found
-        // Case 1: No child
-        if (!root->left && !root->right) {
-            delete root;
-            return NULL;
-        }
-        // Case 2: One child
-        if (!root->left) {
-            BTNODE* tmp = root->right;
-            delete root;
-            return tmp;
-        } else if (!root->right) {
-            BTNODE* tmp = root->left;
-            delete root;
-            return tmp;
-        }
-        // Case 3: Two children
-        BTNODE* succ = findMin(root->right);
-        root->key = succ->key;
-        root->right = deleteNode(root->right, succ->key);
-    }
-    return root;
-}
-
-// Queue for Level Order Display
-typedef struct qnode {
-    BTNODE* treenode;
-    struct qnode* next;
-} QNODE;
-
-void qEnqueue(QNODE*& front, QNODE*& rear, BTNODE* t) {
-    QNODE* qn = new QNODE;
-    qn->treenode = t;
-    qn->next = NULL;
-    
-    if (!front) { 
-        front = rear = qn; 
-    } else { 
-        rear->next = qn; 
-        rear = qn; 
-    }
-}
-
-BTNODE* qDequeue(QNODE*& front, QNODE*& rear) {
-    if (!front) return NULL;
-    QNODE* tmp = front;
-    BTNODE* t = front->treenode;
-    front = front->next;
-    if (!front) rear = NULL;
-    delete tmp;
+node* create(int x) {
+    node* t = new node;
+    t->data = x;
+    t->left = t->right = NULL;
     return t;
 }
 
-bool qIsEmpty(QNODE* front) {
-    return front == NULL;
+node* insert(node* root, int x) {
+    if (root == NULL)
+        return create(x);
+
+    if (x < root->data)
+        root->left = insert(root->left, x);
+    else
+        root->right = insert(root->right, x);
+
+    return root;
 }
 
-void inorder(BTNODE* root) {
-    if (!root) return;
-    inorder(root->left);
-    cout << root->key << " ";
-    inorder(root->right);
+node* findMin(node* root) {
+    while (root->left != NULL)
+        root = root->left;
+    return root;
 }
 
-void levelOrderDisplay(BTNODE* root) {
-    if (!root) {
-        cout << "(Tree is empty)\n";
-        return;
+node* del(node* root, int x) {
+    if (root == NULL) return root;
+
+    if (x < root->data)
+        root->left = del(root->left, x);
+    else if (x > root->data)
+        root->right = del(root->right, x);
+    else {
+        if (root->left == NULL) {
+            node* temp = root->right;
+            delete root;
+            return temp;
+        }
+        else if (root->right == NULL) {
+            node* temp = root->left;
+            delete root;
+            return temp;
+        }
+        node* temp = findMin(root->right);
+        root->data = temp->data;
+        root->right = del(root->right, temp->data);
     }
-    QNODE* front = NULL; 
-    QNODE* rear = NULL;
-    
-    qEnqueue(front, rear, root);
-    cout << "Level-order: ";
-    
-    while (!qIsEmpty(front)) {
-        BTNODE* cur = qDequeue(front, rear);
-        cout << cur->key << " ";
-        if (cur->left) qEnqueue(front, rear, cur->left);
-        if (cur->right) qEnqueue(front, rear, cur->right);
-    }
-    cout << "\n";
+    return root;
 }
 
-void freeTree(BTNODE* root) {
+void levelOrder(node* root) {
     if (!root) return;
-    freeTree(root->left);
-    freeTree(root->right);
-    delete root;
+    node* q[30];
+    int f = 0, r = 0;
+
+    q[r++] = root;
+    while (f < r) {
+        node* t = q[f++];
+        cout << t->data << " ";
+        if (t->left) q[r++] = t->left;
+        if (t->right) q[r++] = t->right;
+    }
 }
 
-int main() {
-    BTNODE* root = NULL;
-    int choice;
-    cout << "=== Binary Search Tree Operations ===\n";
-    do {
-        cout << "\nMENU: \n";
-        cout << "1. Create tree (insert multiple keys)\n";
-        cout << "2. Insert key\n";
-        cout << "3. Delete key\n";
-        cout << "4. Level-wise display\n";
-        cout << "5. Inorder display (sorted)\n";
-        cout << "6. Exit\n";
-        cout << "Enter choice: ";
-        cin >> choice;
+void main() {
+    clrscr();
+    node* root = NULL;
+    int n, i, x, delkey;
 
-        if (choice == 1) {
-            int n;
-            cout << "How many keys to insert initially? ";
-            cin >> n;
-            cout << "Enter keys (space separated): \n";
-            for (int i = 0; i < n; ++i) {
-                int k; cin >> k;
-                root = insertNode(root, k);
-            }
-            cout << "Tree created/updated.\n";
-        }
-        else if (choice == 2) {
-            int k;
-            cout << "Enter key to insert: ";
-            cin >> k;
-            root = insertNode(root, k);
-            cout << "Inserted " << k << ".\n";
-        }
-        else if (choice == 3) {
-            int k;
-            cout << "Enter key to delete: ";
-            cin >> k;
-            root = deleteNode(root, k);
-        }
-        else if (choice == 4) {
-            levelOrderDisplay(root);
-        }
-        else if (choice == 5) {
-            cout << "Inorder: ";
-            if (!root) cout << "(empty)";
-            else inorder(root);
-            cout << "\n";
-        }
-        else if (choice == 6) {
-            cout << "Exiting. Freeing tree memory.\n";
-            freeTree(root);
-        }
-        else {
-            cout << "Invalid choice.\n";
-        }
-    } while (choice != 6);
-    
-    return 0;
+    cout << "Enter number of nodes: ";
+    cin >> n;
+
+    for (i = 0; i < n; i++) {
+        cout << "Enter data: ";
+        cin >> x;
+        root = insert(root, x);
+    }
+
+    cout << "\nLevel Order Traversal: ";
+    levelOrder(root);
+
+    cout << "\nEnter element to delete: ";
+    cin >> delkey;
+    root = del(root, delkey);
+
+    cout << "After Deletion: ";
+    levelOrder(root);
+
+    getch();
 }
 ```
 
