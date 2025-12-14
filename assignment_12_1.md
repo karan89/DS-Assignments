@@ -6,99 +6,147 @@ WAP to simulate a faculty database as a hash table. Search a particular faculty 
 ## Code
 
 ```cpp
-#include <iostream>
-#include <string>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
+#include <string.h>
 
 #define SIZE 10
 
-// Faculty Node (Linked List)
-struct Faculty {
+struct Faculty
+{
     int id;
-    string name;
-    Faculty* next;
+    char name[20];
+    int next;   // index of next element in chain
 };
 
-// Hash table (array of linked list heads)
-Faculty* table[SIZE];
+Faculty table[SIZE];
 
-// Divide hash function
-int hashFunction(int key) {
+/* Hash function (Divide method) */
+int hashFunction(int key)
+{
     return key % SIZE;
 }
 
-// Insert faculty (Chaining without replacement)
-void insert(int id, string name) {
+/* Insert using linear probing with chaining without replacement */
+void insertFaculty(int id, char name[])
+{
     int index = hashFunction(id);
-    
-    Faculty* newNode = new Faculty();
-    newNode->id = id;
-    newNode->name = name;
-    newNode->next = NULL;
 
-    // If slot is empty, place directly
-    if (table[index] == NULL) {
-        table[index] = newNode;
-    } else {
-        // Go to end of chain (no replacement of first node)
-        Faculty* temp = table[index];
-        while (temp->next != NULL) {
-            temp = temp->next;
-        }
-        temp->next = newNode;
+    if (table[index].id == -1)
+    {
+        table[index].id = id;
+        strcpy(table[index].name, name);
+        table[index].next = -1;
+        return;
     }
+
+    /* Find empty slot using linear probing */
+    int i = (index + 1) % SIZE;
+    while (i != index && table[i].id != -1)
+        i = (i + 1) % SIZE;
+
+    if (i == index)
+    {
+        cout << "Hash table is full\n";
+        return;
+    }
+
+    table[i].id = id;
+    strcpy(table[i].name, name);
+    table[i].next = -1;
+
+    /* Link chain */
+    int p = index;
+    while (table[p].next != -1)
+        p = table[p].next;
+    table[p].next = i;
 }
 
-// Search faculty
-void search(int id) {
+/* Search faculty */
+void searchFaculty(int id)
+{
     int index = hashFunction(id);
-    Faculty* temp = table[index];
-    
-    while (temp != NULL) {
-        if (temp->id == id) {
-            cout << "\nFaculty Found:";
-            cout << "\nID   : " << temp->id;
-            cout << "\nName : " << temp->name << endl;
+
+    int p = index;
+    while (p != -1)
+    {
+        if (table[p].id == id)
+        {
+            cout << "\nFaculty Found\n";
+            cout << "ID   : " << table[p].id << endl;
+            cout << "Name : " << table[p].name << endl;
             return;
         }
-        temp = temp->next;
+        p = table[p].next;
     }
-    cout << "\nFaculty Not Found!" << endl;
+
+    cout << "Faculty Not Found\n";
 }
 
-// Display table
-void display() {
-    cout << "\nFaculty Hash Table: \n";
-    for (int i = 0; i < SIZE; i++) {
-        cout << i << " -> ";
-        Faculty* temp = table[i];
-        while (temp != NULL) {
-            cout << "(" << temp->id << ", " << temp->name << ") -> ";
-            temp = temp->next;
+/* Display hash table */
+void display()
+{
+    int i;
+    cout << "\n--- FACULTY HASH TABLE ---\n";
+    for (i = 0; i < SIZE; i++)
+    {
+        cout << i << " : ";
+        if (table[i].id == -1)
+            cout << "EMPTY\n";
+        else
+            cout << table[i].id << ", " << table[i].name
+                 << " -> " << table[i].next << endl;
+    }
+}
+
+/* MAIN */
+void main()
+{
+    int i, ch, id;
+    char name[20];
+    clrscr();
+
+    for (i = 0; i < SIZE; i++)
+    {
+        table[i].id = -1;
+        table[i].next = -1;
+    }
+
+    do
+    {
+        cout << "\n--- FACULTY MENU ---\n";
+        cout << "1. Insert Faculty\n";
+        cout << "2. Search Faculty\n";
+        cout << "3. Display Table\n";
+        cout << "4. Exit\n";
+        cout << "Enter choice: ";
+        cin >> ch;
+
+        switch (ch)
+        {
+        case 1:
+            cout << "Enter Faculty ID: ";
+            cin >> id;
+            cout << "Enter Name: ";
+            cin >> name;
+            insertFaculty(id, name);
+            break;
+
+        case 2:
+            cout << "Enter Faculty ID to search: ";
+            cin >> id;
+            searchFaculty(id);
+            break;
+
+        case 3:
+            display();
+            break;
         }
-        cout << "NULL" << endl;
-    }
+    } while (ch != 4);
+
+    getch();
 }
 
-int main() {
-    // Initialize table
-    for (int i = 0; i < SIZE; i++) {
-        table[i] = NULL;
-    }
-
-    // Sample data
-    insert(21, "Sharma");
-    insert(31, "Mehta");
-    insert(41, "Rao");
-    insert(52, "Khan");
-
-    display();
-
-    cout << "\nSearching Faculty ID 31:";
-    search(31);
-
-    return 0;
-}
 ```
 
 ## Output
