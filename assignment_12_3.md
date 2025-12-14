@@ -6,134 +6,139 @@ WAP to simulate employee databases as a hash table. Search a particular faculty 
 ## Code
 
 ```cpp
-#include <iostream>
-#include <string>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
+#include <string.h>
 
 #define SIZE 10
 
-// Linked List Node
-struct Employee {
+struct Employee
+{
     int id;
-    string name;
-    string dept;
-    // Note: 'next' is unused in linear probing, but struct kept from PDF
-    Employee* next; 
+    char name[20];
+    char dept[20];
 };
 
-// Hash Table (Array of pointers to Employee objects)
-Employee* hashTable[SIZE];
+Employee table[SIZE];
 
-// Mid-Square Hash Function
-int midSquareHash(int key) {
-    long long square = (long long)key * key;
-    // Extract middle digit: square / 10 then % SIZE (assuming SIZE=10)
-    int mid = (square / 10) % SIZE; 
-    return mid;
+/* Mid-Square Hash Function */
+int midSquareHash(int key)
+{
+    long sq = (long)key * key;
+    return (sq / 10) % SIZE;
 }
 
-// Create new node
-Employee* createNode(int id, string name, string dept) {
-    Employee* temp = new Employee;
-    temp->id = id;
-    temp->name = name;
-    temp->dept = dept;
-    temp->next = NULL;
-    return temp;
-}
-
-// Insert using Linear Probing
-void insertEmployee(int id, string name, string dept) {
+/* Insert using Linear Probing */
+void insertEmployee(int id, char name[], char dept[])
+{
     int index = midSquareHash(id);
-    int originalIndex = index;
+    int start = index;
 
-    // Linear probing if collision
-    while (hashTable[index] != NULL) {
+    while (table[index].id != -1)
+    {
         index = (index + 1) % SIZE;
-        if (index == originalIndex) {
-            cout << "Hash Table Full!\n";
+        if (index == start)
+        {
+            cout << "Hash table is full\n";
             return;
         }
     }
-    hashTable[index] = createNode(id, name, dept);
+
+    table[index].id = id;
+    strcpy(table[index].name, name);
+    strcpy(table[index].dept, dept);
+
+    cout << "Employee inserted at index " << index << endl;
 }
 
-// Search Employee
-void searchEmployee(int id) {
+/* Search Employee */
+void searchEmployee(int id)
+{
     int index = midSquareHash(id);
-    int startIndex = index;
+    int start = index;
 
-    while (hashTable[index] != NULL) {
-        if (hashTable[index]->id == id) {
-            cout << "\nEmployee Found!\n";
-            cout << "ID: " << hashTable[index]->id << endl;
-            cout << "Name: " << hashTable[index]->name << endl;
-            cout << "Department: " << hashTable[index]->dept << endl;
+    while (table[index].id != -1)
+    {
+        if (table[index].id == id)
+        {
+            cout << "\nEmployee Found\n";
+            cout << "ID   : " << table[index].id << endl;
+            cout << "Name : " << table[index].name << endl;
+            cout << "Dept : " << table[index].dept << endl;
             return;
         }
-        
+
         index = (index + 1) % SIZE;
-        if (index == startIndex) {
+        if (index == start)
             break;
-        }
     }
-    cout << "\nEmployee Not Found!\n";
+
+    cout << "Employee not found\n";
 }
 
-// Display Hash Table
-void display() {
-    cout << "\nHash Table: \n";
-    for (int i = 0; i < SIZE; i++) {
-        cout << i << " -> ";
-        if (hashTable[i] != NULL) {
-            cout << hashTable[i]->id << " | "
-                 << hashTable[i]->name << " | "
-                 << hashTable[i]->dept;
-        }
-        cout << endl;
+/* Display Hash Table */
+void display()
+{
+    int i;
+    cout << "\nEmployee Hash Table:\n";
+    for (i = 0; i < SIZE; i++)
+    {
+        if (table[i].id == -1)
+            cout << i << " : EMPTY\n";
+        else
+            cout << i << " : " << table[i].id << " | "
+                 << table[i].name << " | "
+                 << table[i].dept << endl;
     }
 }
 
-int main() {
-    int choice, id;
-    string name, dept;
+/* MAIN */
+void main()
+{
+    int i, ch, id;
+    char name[20], dept[20];
+    clrscr();
 
-    for (int i = 0; i < SIZE; i++) {
-        hashTable[i] = NULL;
-    }
+    for (i = 0; i < SIZE; i++)
+        table[i].id = -1;
 
-    do {
-        cout << "\n--- Employee Database Menu ---\n";
+    do
+    {
+        cout << "\n--- EMPLOYEE MENU ---\n";
         cout << "1. Insert Employee\n";
         cout << "2. Search Employee\n";
         cout << "3. Display Hash Table\n";
         cout << "4. Exit\n";
         cout << "Enter choice: ";
-        cin >> choice;
+        cin >> ch;
 
-        switch (choice) {
-            case 1:
-                cout << "Enter Employee ID: ";
-                cin >> id;
-                cout << "Enter Name: ";
-                cin >> name;
-                cout << "Enter Department: ";
-                cin >> dept;
-                insertEmployee(id, name, dept);
-                break;
-            case 2:
-                cout << "Enter Employee ID to Search: ";
-                cin >> id;
-                searchEmployee(id);
-                break;
-            case 3:
-                display();
-                break;
+        switch (ch)
+        {
+        case 1:
+            cout << "Enter Employee ID: ";
+            cin >> id;
+            cout << "Enter Name: ";
+            cin >> name;
+            cout << "Enter Department: ";
+            cin >> dept;
+            insertEmployee(id, name, dept);
+            break;
+
+        case 2:
+            cout << "Enter Employee ID to search: ";
+            cin >> id;
+            searchEmployee(id);
+            break;
+
+        case 3:
+            display();
+            break;
         }
-    } while (choice != 4);
+    } while (ch != 4);
 
-    return 0;
+    getch();
 }
+
 ```
 
 ## Output
