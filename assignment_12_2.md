@@ -6,142 +6,164 @@ WAP to simulate a faculty database as a hash table. Search a particular faculty 
 ## Code
 
 ```cpp
-#include <iostream>
-#include <string>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
+#include <string.h>
 
 #define SIZE 10
 
-// Node for Linked List
-struct Faculty {
+struct Faculty
+{
     int id;
-    string name;
-    string dept;
-    Faculty* next;
+    char name[20];
+    char dept[20];
+    int next;   // index for chain
 };
 
-// Hash Table
-Faculty* hashTable[SIZE];
+Faculty table[SIZE];
 
-// Hash Function (MOD)
-int hashFunction(int key) {
+/* Hash Function (MOD / Divide method) */
+int hashFunction(int key)
+{
     return key % SIZE;
 }
 
-// Create new node
-Faculty* createNode(int id, string name, string dept) {
-    Faculty* temp = new Faculty;
-    temp->id = id;
-    temp->name = name;
-    temp->dept = dept;
-    temp->next = NULL;
-    return temp;
-}
-
-// Insert using Chaining with Replacement
-void insertFaculty(int id, string name, string dept) {
+/* Insert using chaining with replacement */
+void insertFaculty(int id, char name[], char dept[])
+{
     int index = hashFunction(id);
-    Faculty* newNode = createNode(id, name, dept);
 
-    // If slot empty, place directly
-    if (hashTable[index] == NULL) {
-        hashTable[index] = newNode;
-    } else {
-        // Check replacement condition: 
-        // If the node at this index doesn't actually belong here (it's part of a chain from elsewhere),
-        // we replace it to maintain efficient lookup for the 'home' index.
-        if (hashFunction(hashTable[index]->id) != index) {
-            // Replace existing node
-            Faculty* temp = hashTable[index];
-            hashTable[index] = newNode;
-            newNode->next = temp; 
-            // Note: In a true chaining with replacement implementation, 
-            // we would also need to update the 'next' pointer of the node pointing to 'temp'
-            // to point to newNode, but simple array-based chaining logic usually implies 
-            // coalesced hashing or just head insertion.
-        } else {
-            // Normal chaining (append to end)
-            Faculty* ptr = hashTable[index];
-            while (ptr->next != NULL) {
-                ptr = ptr->next;
-            }
-            ptr->next = newNode;
-        }
+    /* If home position empty */
+    if (table[index].id == -1)
+    {
+        table[index].id = id;
+        strcpy(table[index].name, name);
+        strcpy(table[index].dept, dept);
+        table[index].next = -1;
+        return;
+    }
+
+    /* Find empty slot using linear probing */
+    int i = (index + 1) % SIZE;
+    while (i != index && table[i].id != -1)
+        i = (i + 1) % SIZE;
+
+    if (i == index)
+    {
+        cout << "Hash table full\n";
+        return;
+    }
+
+    /* If occupant at home index does NOT belong there → replace */
+    if (hashFunction(table[index].id) != index)
+    {
+        table[i] = table[index];   // move old record
+        table[index].id = id;
+        strcpy(table[index].name, name);
+        strcpy(table[index].dept, dept);
+        table[index].next = i;
+    }
+    else
+    {
+        table[i].id = id;
+        strcpy(table[i].name, name);
+        strcpy(table[i].dept, dept);
+        table[i].next = -1;
+
+        int p = index;
+        while (table[p].next != -1)
+            p = table[p].next;
+        table[p].next = i;
     }
 }
 
-// Search Faculty
-void searchFaculty(int id) {
+/* Search Faculty */
+void searchFaculty(int id)
+{
     int index = hashFunction(id);
-    Faculty* ptr = hashTable[index];
+    int p = index;
 
-    while (ptr != NULL) {
-        if (ptr->id == id) {
-            cout << "\nFaculty Found!\n";
-            cout << "ID: " << ptr->id << endl;
-            cout << "Name: " << ptr->name << endl;
-            cout << "Department: " << ptr->dept << endl;
+    while (p != -1)
+    {
+        if (table[p].id == id)
+        {
+            cout << "\nFaculty Found\n";
+            cout << "ID   : " << table[p].id << endl;
+            cout << "Name : " << table[p].name << endl;
+            cout << "Dept : " << table[p].dept << endl;
             return;
         }
-        ptr = ptr->next;
+        p = table[p].next;
     }
-    cout << "\nFaculty Not Found!\n";
+
+    cout << "Faculty Not Found\n";
 }
 
-// Display Hash Table
-void display() {
-    for (int i = 0; i < SIZE; i++) {
-        cout << i << " -> ";
-        Faculty* ptr = hashTable[i];
-        while (ptr != NULL) {
-            cout << "[" << ptr->id << " | " << ptr->name << "] -> ";
-            ptr = ptr->next;
-        }
-        cout << "NULL\n";
+/* Display Hash Table */
+void display()
+{
+    int i;
+    cout << "\n--- FACULTY HASH TABLE ---\n";
+    for (i = 0; i < SIZE; i++)
+    {
+        if (table[i].id == -1)
+            cout << i << " : EMPTY\n";
+        else
+            cout << i << " : [" << table[i].id << ", "
+                 << table[i].name << "] -> " << table[i].next << endl;
     }
 }
 
-int main() {
-    int choice, id;
-    string name, dept;
+/* MAIN */
+void main()
+{
+    int i, ch, id;
+    char name[20], dept[20];
+    clrscr();
 
-    // Initialize Hash Table
-    for (int i = 0; i < SIZE; i++) {
-        hashTable[i] = NULL;
+    for (i = 0; i < SIZE; i++)
+    {
+        table[i].id = -1;
+        table[i].next = -1;
     }
 
-    do {
-        cout << "\n--- Faculty Database Menu ---\n";
+    do
+    {
+        cout << "\n--- FACULTY MENU ---\n";
         cout << "1. Insert Faculty\n";
         cout << "2. Search Faculty\n";
         cout << "3. Display Hash Table\n";
         cout << "4. Exit\n";
         cout << "Enter choice: ";
-        cin >> choice;
+        cin >> ch;
 
-        switch (choice) {
-            case 1:
-                cout << "Enter Faculty ID: ";
-                cin >> id;
-                cout << "Enter Name: ";
-                cin >> name;
-                cout << "Enter Department: ";
-                cin >> dept;
-                insertFaculty(id, name, dept);
-                break;
-            case 2:
-                cout << "Enter Faculty ID to Search: ";
-                cin >> id;
-                searchFaculty(id);
-                break;
-            case 3:
-                display();
-                break;
+        switch (ch)
+        {
+        case 1:
+            cout << "Enter Faculty ID: ";
+            cin >> id;
+            cout << "Enter Name: ";
+            cin >> name;
+            cout << "Enter Department: ";
+            cin >> dept;
+            insertFaculty(id, name, dept);
+            break;
+
+        case 2:
+            cout << "Enter Faculty ID to search: ";
+            cin >> id;
+            searchFaculty(id);
+            break;
+
+        case 3:
+            display();
+            break;
         }
-    } while (choice != 4);
+    } while (ch != 4);
 
-    return 0;
+    getch();
 }
+
 ```
 
 ## Output
