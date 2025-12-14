@@ -6,105 +6,100 @@ Write a program that maintains a queue of passengers waiting to see a ticket age
 ## Code
 
 ```cpp
-#include <iostream>
-#include <string>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
+#include <string.h>
 
-struct Node {
-    string name;
-    Node* next;
+struct Node
+{
+    char name[20];
+    Node *next;
 };
 
-Node* frontPtr = NULL;
-Node* rearPtr = NULL;
+Node *front = NULL;
+Node *rear  = NULL;
+int count = 0;
 
-// Insert passenger at rear
-void enqueue(string name) {
-    Node* n = new Node;
-    n->name = name;
-    n->next = NULL;
-    
-    if (rearPtr == NULL) {
-        frontPtr = rearPtr = n;
-    } else {
-        rearPtr->next = n;
-        rearPtr = n;
+/* Enqueue */
+void enqueue(char name[])
+{
+    Node *t = new Node;
+    strcpy(t->name, name);
+    t->next = NULL;
+
+    if (front == NULL)
+        front = rear = t;
+    else
+    {
+        rear->next = t;
+        rear = t;
     }
-    cout << name << " added to the queue.\n";
+    count++;
 }
 
-// Display front passenger
-void showFront() {
-    if (frontPtr == NULL) {
-        cout << "Queue is empty.\n";
-    } else {
-        cout << "Front passenger: " << frontPtr->name << "\n";
-    }
-}
+/* Dequeue */
+void dequeue()
+{
+    Node *t;
 
-// Remove front passenger
-void dequeue() {
-    if (frontPtr == NULL) {
-        cout << "Queue is empty.\n";
+    if (front == NULL)
+    {
+        cout << "Queue Empty\n";
         return;
     }
-    
-    Node* temp = frontPtr;
-    cout << "Removing: " << frontPtr->name << "\n";
-    frontPtr = frontPtr->next;
-    
-    if (frontPtr == NULL) 
-        rearPtr = NULL;
-        
-    delete temp;
+
+    t = front;
+    cout << "Removed: " << t->name << endl;
+    front = front->next;
+
+    if (front == NULL)
+        rear = NULL;
+
+    delete t;
+    count--;
 }
 
-// Count passengers
-int countPassengers() {
-    int count = 0;
-    Node* temp = frontPtr;
-    while (temp != NULL) {
-        count++;
-        temp = temp->next;
-    }
-    return count;
+/* Show front */
+void showFront()
+{
+    if (front == NULL)
+        cout << "Queue Empty\n";
+    else
+        cout << "Front: " << front->name << endl;
 }
 
-int main() {
-    int choice;
-    string pname;
-    
-    do {
-        cout << "\n---- Passenger Queue Menu ----\n";
-        cout << "1. Insert new passenger\n";
-        cout << "2. Show front passenger\n";
-        cout << "3. Remove front passenger\n";
-        cout << "4. Exit\n";
-        cout << "Enter choice: ";
-        cin >> choice;
-        
-        switch (choice) {
-            case 1:
-                cout << "Enter passenger name: ";
-                cin >> pname;
-                enqueue(pname);
-                break;
-            case 2:
-                showFront();
-                break;
-            case 3:
-                dequeue();
-                break;
-            case 4:
-                cout << "\nProgram ending...\n";
-                cout << "Passengers left in queue: " << countPassengers() << "\n";
-                break;
-            default:
-                cout << "Invalid choice.\n";
+/* MAIN */
+void main()
+{
+    int ch;
+    char name[20];
+    clrscr();
+
+    do
+    {
+        cout << "\n1.Enqueue";
+        cout << "\n2.Dequeue";
+        cout << "\n3.Show Front";
+        cout << "\n4.Exit";
+        cout << "\nChoice: ";
+        cin >> ch;
+
+        if (ch == 1)
+        {
+            cout << "Enter name: ";
+            cin >> name;
+            enqueue(name);
         }
-    } while (choice != 4);
-    
-    return 0;
+        else if (ch == 2)
+            dequeue();
+        else if (ch == 3)
+            showFront();
+
+    } while (ch != 4);
+
+    cout << "\nPassengers left in queue: " << count;
+
+    getch();
 }
 ```
 
