@@ -6,131 +6,139 @@ Search employee records using a Tree and sort them by employee ID.
 ## Code
 
 ```cpp
-#include <iostream>
-#include <string>
-#include <limits>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
+#include <string.h>
 
-typedef struct emp {
+struct Emp
+{
     int empid;
-    string name;
-    string dept;
-    double salary;
-    struct emp* left;
-    struct emp* right;
-} EMPNODE;
+    char name[20];
+    char dept[20];
+    float salary;
+    Emp *left, *right;
+};
 
-EMPNODE* createEmpNode(int id, const string &name, const string &dept, double sal) {
-    EMPNODE* p = new EMPNODE;
-    p->empid = id;
-    p->name = name;
-    p->dept = dept;
-    p->salary = sal;
-    p->left = p->right = NULL;
-    return p;
+Emp *root = NULL;
+
+/* Create employee node */
+Emp* createNode(int id, char n[], char d[], float s)
+{
+    Emp *t = new Emp;
+    t->empid = id;
+    strcpy(t->name, n);
+    strcpy(t->dept, d);
+    t->salary = s;
+    t->left = t->right = NULL;
+    return t;
 }
 
-EMPNODE* insertEmployee(EMPNODE* root, int id, const string &name, const string &dept, double sal) {
-    if (!root) return createEmpNode(id, name, dept, sal);
-    
-    if (id < root->empid)
-        root->left = insertEmployee(root->left, id, name, dept, sal);
-    else if (id > root->empid)
-        root->right = insertEmployee(root->right, id, name, dept, sal);
-    else {
-        root->name = name;
-        root->dept = dept;
-        root->salary = sal;
-        cout << "Updated existing employee record with empid " << id << ".\n";
+/* Insert employee */
+Emp* insert(Emp *r, int id, char n[], char d[], float s)
+{
+    if (r == NULL)
+        return createNode(id, n, d, s);
+
+    if (id < r->empid)
+        r->left = insert(r->left, id, n, d, s);
+    else if (id > r->empid)
+        r->right = insert(r->right, id, n, d, s);
+    else
+    {
+        // Update existing employee
+        strcpy(r->name, n);
+        strcpy(r->dept, d);
+        r->salary = s;
+        cout << "Employee updated.\n";
     }
-    return root;
+    return r;
 }
 
-EMPNODE* searchEmployee(EMPNODE* root, int id) {
-    if (!root) return NULL;
-    if (id == root->empid) return root;
-    if (id < root->empid) return searchEmployee(root->left, id);
-    return searchEmployee(root->right, id);
+/* Search employee */
+void search(Emp *r, int id)
+{
+    if (r == NULL)
+        cout << "Employee NOT FOUND\n";
+    else if (r->empid == id)
+    {
+        cout << "EmpID: " << r->empid << endl;
+        cout << "Name: " << r->name << endl;
+        cout << "Dept: " << r->dept << endl;
+        cout << "Salary: " << r->salary << endl;
+    }
+    else if (id < r->empid)
+        search(r->left, id);
+    else
+        search(r->right, id);
 }
 
-void inorderDisplay(EMPNODE* root) {
-    if (!root) return;
-    inorderDisplay(root->left);
-    cout << "EmpID: " << root->empid 
-         << " | Name: " << root->name 
-         << " | Dept: " << root->dept 
-         << " | Salary: " << root->salary << "\n";
-    inorderDisplay(root->right);
+/* Inorder traversal (sorted output) */
+void inorder(Emp *r)
+{
+    if (r != NULL)
+    {
+        inorder(r->left);
+        cout << r->empid << "  "
+             << r->name << "  "
+             << r->dept << "  "
+             << r->salary << endl;
+        inorder(r->right);
+    }
 }
 
-void freeBST(EMPNODE* root) {
-    if (!root) return;
-    freeBST(root->left);
-    freeBST(root->right);
-    delete root;
-}
+/* MAIN */
+void main()
+{
+    int ch, id;
+    char name[20], dept[20];
+    float sal;
+    clrscr();
 
-int main() {
-    EMPNODE* root = NULL;
-    int choice;
-    cout << "=== Employee Records using BST (search & sort by empid) ===\n";
-    do {
-        cout << "\nMenu:\n";
-        cout << "1. Insert / Update employee\n";
-        cout << "2. Search employee by empid\n";
-        cout << "3. Show all employees (sorted by empid)\n";
+    do
+    {
+        cout << "\n--- EMPLOYEE MENU ---\n";
+        cout << "1. Insert / Update Employee\n";
+        cout << "2. Search Employee\n";
+        cout << "3. Display All Employees (Sorted)\n";
         cout << "4. Exit\n";
         cout << "Enter choice: ";
-        cin >> choice;
-        
-        if (choice == 1) {
-            int id;
-            string name, dept;
-            double sal;
-            cout << "Enter empid (integer): ";
+        cin >> ch;
+
+        switch (ch)
+        {
+        case 1:
+            cout << "Enter EmpID: ";
             cin >> id;
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Enter name: ";
-            getline(cin, name);
-            cout << "Enter department: ";
-            getline(cin, dept);
-            cout << "Enter salary: ";
+            cout << "Enter Name: ";
+            cin >> name;
+            cout << "Enter Department: ";
+            cin >> dept;
+            cout << "Enter Salary: ";
             cin >> sal;
-            
-            root = insertEmployee(root, id, name, dept, sal);
-            cout << "Employee inserted/updated.\n";
-        }
-        else if (choice == 2) {
-            int id;
-            cout << "Enter empid to search: ";
+            root = insert(root, id, name, dept, sal);
+            break;
+
+        case 2:
+            cout << "Enter EmpID to search: ";
             cin >> id;
-            EMPNODE* found = searchEmployee(root, id);
-            if (!found)
-                cout << "Employee with empid " << id << " NOT found.\n";
+            search(root, id);
+            break;
+
+        case 3:
+            if (root == NULL)
+                cout << "No employee records.\n";
             else
-                cout << "Found: EmpID: " << found->empid 
-                     << " | Name: " << found->name 
-                     << " | Dept: " << found->dept 
-                     << " | Salary: " << found->salary << "\n";
-        }
-        else if (choice == 3) {
-            if (!root) cout << "(No employee records)\n";
-            else {
-                cout << "\nEmployees sorted by empid (ascending):\n";
-                inorderDisplay(root);
+            {
+                cout << "\nEmpID  Name  Dept  Salary\n";
+                inorder(root);
             }
+            break;
         }
-        else if (choice == 4) {
-            cout << "Exiting. Freeing memory.\n";
-            freeBST(root);
-        }
-        else {
-            cout << "Invalid choice. Try again.\n";
-        }
-    } while (choice != 4);
-    
-    return 0;
+    } while (ch != 4);
+
+    getch();
 }
+
 ```
 
 ## Output
