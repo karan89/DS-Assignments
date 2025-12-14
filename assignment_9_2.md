@@ -9,10 +9,9 @@ Write a Program to implement Prim's algorithm to find minimum spanning tree of a
 #include <iostream.h>
 #include <conio.h>
 
-#define MAXV 20
-#define MAXE 50
+#define MAX 20
+#define INF 9999
 
-/* Adjacency List Node */
 struct Node
 {
     int v;
@@ -20,21 +19,10 @@ struct Node
     Node *next;
 };
 
-/* Edge structure for Kruskal */
-struct Edge
-{
-    int src;
-    int dest;
-    int weight;
-};
+Node *adj[MAX];
+int V;
 
-Node *adj[MAXV];
-Edge edges[MAXE];
-int parent[MAXV];
-
-int V, E, edgeCount = 0;
-
-/* Create adjacency list edge */
+/* Add edge (undirected graph) */
 void addEdge(int u, int v, int w)
 {
     Node *t = new Node;
@@ -48,78 +36,64 @@ void addEdge(int u, int v, int w)
     t->w = w;
     t->next = adj[v];
     adj[v] = t;
-
-    /* Store edge only once */
-    edges[edgeCount].src = u;
-    edges[edgeCount].dest = v;
-    edges[edgeCount].weight = w;
-    edgeCount++;
 }
 
-/* Find set */
-int findSet(int i)
+/* Prim's Algorithm */
+void primMST()
 {
-    while (parent[i] != i)
-        i = parent[i];
-    return i;
-}
+    int parent[MAX], key[MAX], mst[MAX];
+    int i, count, u, min, total = 0;
 
-/* Union sets */
-void unionSet(int a, int b)
-{
-    int x = findSet(a);
-    int y = findSet(b);
-    parent[x] = y;
-}
-
-/* Kruskal Algorithm */
-void kruskal()
-{
-    int i, j;
-    Edge temp;
-    int totalCost = 0;
-
-    /* Initialize parent */
     for (i = 0; i < V; i++)
-        parent[i] = i;
-
-    /* Sort edges by weight (Bubble Sort) */
-    for (i = 0; i < edgeCount - 1; i++)
     {
-        for (j = 0; j < edgeCount - i - 1; j++)
+        key[i] = INF;
+        mst[i] = 0;
+    }
+
+    key[0] = 0;
+    parent[0] = -1;
+
+    for (count = 0; count < V - 1; count++)
+    {
+        min = INF;
+        for (i = 0; i < V; i++)
         {
-            if (edges[j].weight > edges[j + 1].weight)
+            if (mst[i] == 0 && key[i] < min)
             {
-                temp = edges[j];
-                edges[j] = edges[j + 1];
-                edges[j + 1] = temp;
+                min = key[i];
+                u = i;
             }
+        }
+
+        mst[u] = 1;
+
+        Node *p = adj[u];
+        while (p != NULL)
+        {
+            if (mst[p->v] == 0 && p->w < key[p->v])
+            {
+                key[p->v] = p->w;
+                parent[p->v] = u;
+            }
+            p = p->next;
         }
     }
 
     cout << "\nEdges in Minimum Spanning Tree:\n";
-
-    for (i = 0; i < edgeCount; i++)
+    for (i = 1; i < V; i++)
     {
-        int u = edges[i].src;
-        int v = edges[i].dest;
-
-        if (findSet(u) != findSet(v))
-        {
-            cout << u << " - " << v
-                 << "   Weight: " << edges[i].weight << endl;
-            totalCost += edges[i].weight;
-            unionSet(u, v);
-        }
+        cout << parent[i] << " - " << i
+             << "   Weight: " << key[i] << endl;
+        total += key[i];
     }
 
-    cout << "Total Minimum Cost = " << totalCost << endl;
+    cout << "Total Minimum Cost = " << total << endl;
 }
 
 /* MAIN */
 void main()
 {
-    int i, u, v, w;
+    int e, u, v, w, i;
     clrscr();
 
     cout << "Enter number of vertices: ";
@@ -129,20 +103,19 @@ void main()
         adj[i] = NULL;
 
     cout << "Enter number of edges: ";
-    cin >> E;
+    cin >> e;
 
-    for (i = 0; i < E; i++)
+    for (i = 0; i < e; i++)
     {
         cout << "Enter edge (u v weight): ";
         cin >> u >> v >> w;
         addEdge(u, v, w);
     }
 
-    kruskal();
+    primMST();
 
     getch();
 }
-
 
 ```
 
