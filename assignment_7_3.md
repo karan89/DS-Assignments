@@ -6,111 +6,60 @@ Write a Program to create a Binary Tree Search and Find Minimum/Maximum in BST.
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+/*Write a Program to create a Binary Tree Search and Find Minimum/Maximum in BST  */
 
-typedef struct node {
-    int key;
-    struct node* left;
-    struct node* right;
-} BTNODE;
+#include <iostream.h>
+#include <conio.h>
 
-BTNODE* createNode(int k) {
-    BTNODE* n = new BTNODE;
-    n->key = k;
-    n->left = n->right = NULL;
-    return n;
-}
+struct node {
+    int data;
+    node *left, *right;
+};
 
-BTNODE* insertNode(BTNODE* root, int key) {
-    if (root == NULL)
-        return createNode(key);
-        
-    if (key < root->key)
-        root->left = insertNode(root->left, key);
-    else if (key > root->key)
-        root->right = insertNode(root->right, key);
+node* insert(node* root, int x) {
+    if (!root) {
+        root = new node;
+        root->data = x;
+        root->left = root->right = NULL;
+        return root;
+    }
+    if (x < root->data)
+        root->left = insert(root->left, x);
     else
-        cout << "Duplicate key ignored.\n";
-        
+        root->right = insert(root->right, x);
     return root;
 }
 
-BTNODE* findMin(BTNODE* root) {
-    if (!root) return NULL;
+int findMin(node* root) {
     while (root->left)
         root = root->left;
-    return root;
+    return root->data;
 }
 
-BTNODE* findMax(BTNODE* root) {
-    if (!root) return NULL;
+int findMax(node* root) {
     while (root->right)
         root = root->right;
-    return root;
+    return root->data;
 }
 
-void inorder(BTNODE* root) {
-    if (!root) return;
-    inorder(root->left);
-    cout << root->key << " ";
-    inorder(root->right);
-}
+void main() {
+    clrscr();
+    node* root = NULL;
+    int n, i, x;
 
-void freeTree(BTNODE* root) {
-    if (!root) return;
-    freeTree(root->left);
-    freeTree(root->right);
-    delete root;
-}
+    cout << "Enter number of nodes: ";
+    cin >> n;
 
-int main() {
-    BTNODE* root = NULL;
-    int choice, key;
-    cout << "=== BST: Insert, Find Min & Max ===\n";
-    do {
-        cout << "\nMENU\n";
-        cout << "1. Insert Key\n";
-        cout << "2. Display Inorder\n";
-        cout << "3. Find Minimum\n";
-        cout << "4. Find Maximum\n";
-        cout << "5. Exit\n";
-        cout << "Enter choice: ";
-        cin >> choice;
+    for (i = 0; i < n; i++) {
+        cout << "Enter data: ";
+        cin >> x;
+        root = insert(root, x);
+    }
 
-        switch (choice) {
-            case 1:
-                cout << "Enter value to insert: ";
-                cin >> key;
-                root = insertNode(root, key);
-                break;
-            case 2:
-                cout << "Inorder Traversal: ";
-                inorder(root);
-                cout << "\n";
-                break;
-            case 3: {
-                BTNODE* mn = findMin(root);
-                if (mn) cout << "Minimum value = " << mn->key << "\n";
-                else cout << "Tree is empty.\n";
-                break;
-            }
-            case 4: {
-                BTNODE* mx = findMax(root);
-                if (mx) cout << "Maximum value = " << mx->key << "\n";
-                else cout << "Tree is empty.\n";
-                break;
-            }
-            case 5:
-                cout << "Exiting...\n";
-                freeTree(root);
-                break;
-            default:
-                cout << "Invalid choice.\n";
-        }
-    } while (choice != 5);
-    
-    return 0;
+    cout << "\nMinimum Value: " << findMin(root);
+    cout << "\nMaximum Value: " << findMax(root);
+
+    getch();
 }
 ```
 
