@@ -6,70 +6,100 @@ Implement collision resolution using linked lists.
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
 
-#define SIZE 10
-
-// Linked List Node
-struct Node {
+struct Node
+{
     int data;
-    Node* next;
+    Node *next;
 };
 
-// Hash table
-Node* table[SIZE];
+Node *table[20];
+int SIZE;
 
-// Hash Function
-int hashFunction(int key) {
+/* Hash function */
+int hashFunction(int key)
+{
     return key % SIZE;
 }
 
-// Insert element into hash table
-void insert(int key) {
+/* Insert key using chaining */
+void insertKey(int key)
+{
     int index = hashFunction(key);
-    
-    Node* newNode = new Node();
-    newNode->data = key;
-    newNode->next = table[index]; // Add at beginning
-    table[index] = newNode;
+
+    Node *t = new Node;
+    t->data = key;
+    t->next = NULL;
+
+    if (table[index] == NULL)
+        table[index] = t;
+    else
+    {
+        Node *p = table[index];
+        while (p->next != NULL)
+            p = p->next;
+        p->next = t;
+    }
 }
 
-// Display Hash Table
-void display() {
+/* Display hash table */
+void display()
+{
+    int i;
     cout << "\nHash Table:\n";
-    for(int i = 0; i < SIZE; i++) {
+    for (i = 0; i < SIZE; i++)
+    {
         cout << i << " -> ";
-        Node* temp = table[i];
-        while(temp != NULL) {
-            cout << temp->data << " -> ";
-            temp = temp->next;
+        Node *p = table[i];
+        while (p != NULL)
+        {
+            cout << p->data << " -> ";
+            p = p->next;
         }
-        cout << "NULL" << endl;
+        cout << "NULL\n";
     }
 }
 
-int main() {
-    int n, key;
+/* MAIN */
+void main()
+{
+    int choice, key, i;
+    clrscr();
 
-    // Initialize table
-    for(int i = 0; i < SIZE; i++) {
+    cout << "Enter hash table size (max 20): ";
+    cin >> SIZE;
+
+    for (i = 0; i < SIZE; i++)
         table[i] = NULL;
-    }
 
-    cout << "Enter number of elements: ";
-    cin >> n;
+    do
+    {
+        cout << "\n--- MENU ---\n";
+        cout << "1. Insert\n";
+        cout << "2. Display\n";
+        cout << "3. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
 
-    cout << "Enter elements:\n";
-    for(int i = 0; i < n; i++) {
-        cin >> key;
-        insert(key);
-    }
+        switch (choice)
+        {
+        case 1:
+            cout << "Enter key: ";
+            cin >> key;
+            insertKey(key);
+            break;
 
-    display();
+        case 2:
+            display();
+            break;
+        }
+    } while (choice != 3);
 
-    return 0;
+    getch();
 }
+
 ```
 
 ## Output
