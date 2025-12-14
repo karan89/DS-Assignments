@@ -6,76 +6,92 @@ Implement a hash table with collision resolution using linear probing.
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
 
-#define SIZE 10
+#define MAX 20
 
-// Linked List Node
-struct Node {
-    int data;
-};
+int table[MAX];
+int SIZE;
 
-// Hash Table using array of node pointers
-Node* table[SIZE];
-
-// Hash function
-int hashFunction(int key) {
+/* Hash function */
+int hashFunc(int key)
+{
     return key % SIZE;
 }
 
-// Insert using Linear Probing
-void insert(int key) {
-    int index = hashFunction(key);
-    int originalIndex = index;
+/* Insert key using Linear Probing */
+void insertKey(int key)
+{
+    int index = hashFunc(key);
+    int start = index;
 
-    // Linear probing
-    while(table[index] != NULL) {
+    while (table[index] != -1)
+    {
         index = (index + 1) % SIZE;
-        // Check if table is full (looped back to start)
-        if (index == originalIndex) {
-            cout << "Hash Table is Full! Cannot insert " << key << endl;
+
+        if (index == start)
+        {
+            cout << "Hash Table is full\n";
             return;
         }
     }
 
-    table[index] = new Node();
-    table[index]->data = key;
+    table[index] = key;
 }
 
-// Display hash table
-void display() {
-    cout << "\nHash Table: \n";
-    for(int i = 0; i < SIZE; i++) {
-        if(table[i] != NULL) {
-            cout << i << " --> " << table[i]->data << endl;
-        } else {
-            cout << i << " --> NULL" << endl;
+/* Display hash table */
+void display()
+{
+    int i;
+    cout << "\nHash Table:\n";
+    for (i = 0; i < SIZE; i++)
+    {
+        if (table[i] == -1)
+            cout << i << " : EMPTY\n";
+        else
+            cout << i << " : " << table[i] << endl;
+    }
+}
+
+/* MAIN */
+void main()
+{
+    int i, ch, key;
+    clrscr();
+
+    cout << "Enter Hash Table Size (max 20): ";
+    cin >> SIZE;
+
+    for (i = 0; i < SIZE; i++)
+        table[i] = -1;
+
+    do
+    {
+        cout << "\n--- HASH TABLE MENU ---\n";
+        cout << "1. Insert Key\n";
+        cout << "2. Display Table\n";
+        cout << "3. Exit\n";
+        cout << "Enter choice: ";
+        cin >> ch;
+
+        switch (ch)
+        {
+        case 1:
+            cout << "Enter key: ";
+            cin >> key;
+            insertKey(key);
+            break;
+
+        case 2:
+            display();
+            break;
         }
-    }
+    } while (ch != 3);
+
+    getch();
 }
 
-int main() {
-    int n, key;
-
-    // Initialize table
-    for(int i = 0; i < SIZE; i++) {
-        table[i] = NULL;
-    }
-
-    cout << "Enter number of elements: ";
-    cin >> n;
-
-    cout << "Enter elements:\n";
-    for(int i = 0; i < n; i++) {
-        cin >> key;
-        insert(key);
-    }
-
-    display();
-
-    return 0;
-}
 ```
 
 ## Output
