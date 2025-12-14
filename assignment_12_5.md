@@ -6,194 +6,170 @@ Design and implement a smart college placement portal that uses advanced hashing
 ## Code
 
 ```cpp
-#include <iostream>
-#include <string>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
+#include <string.h>
 
-class PlacementPortal {
-    struct Student {
-        int roll;
-        string name;
-        string company;
-        Student* next;
-    };
+#define SIZE 10
 
-    Student** table;
-    int size;
-    int count;
-
-    // Advanced Hash Function
-    int hashFunction(int key) {
-        return key % size;
-    }
-
-    // Create Node
-    Student* createNode(int roll, string name, string company) {
-        Student* temp = new Student;
-        temp->roll = roll;
-        temp->name = name;
-        temp->company = company;
-        temp->next = NULL;
-        return temp;
-    }
-
-    // Rehashing for Dynamic Growth
-    void rehash() {
-        int oldSize = size;
-        Student** oldTable = table;
-
-        size = size * 2;
-        table = new Student*[size];
-
-        for (int i = 0; i < size; i++) {
-            table[i] = NULL;
-        }
-
-        count = 0; // Reset count and increment in insert
-
-        for (int i = 0; i < oldSize; i++) {
-            Student* ptr = oldTable[i];
-            while (ptr != NULL) {
-                // Re-insert into new table
-                insert(ptr->roll, ptr->name, ptr->company);
-                // Save next before deleting or moving
-                Student* temp = ptr;
-                ptr = ptr->next;
-                delete temp; // Cleaning up old node, new node created in insert
-            }
-        }
-        delete[] oldTable;
-        cout << "\nRehashing Completed. New Table Size: " << size << "\n";
-    }
-
-public:
-    PlacementPortal(int s = 10) {
-        size = s;
-        count = 0;
-        table = new Student*[size];
-        for (int i = 0; i < size; i++) {
-            table[i] = NULL;
-        }
-    }
-
-    // Insert Record
-    void insert(int roll, string name, string company) {
-        // Load factor check > 0.7
-        if ((float)count / size > 0.7) {
-            rehash();
-        }
-
-        int index = hashFunction(roll);
-        Student* newNode = createNode(roll, name, company);
-
-        newNode->next = table[index];
-        table[index] = newNode;
-        count++;
-        
-        // This cout is commented out during rehash to avoid spam
-        // cout << "Student Placement Record Added Successfully!\n";
-    }
-
-    // Search Record
-    void search(int roll) {
-        int index = hashFunction(roll);
-        Student* ptr = table[index];
-
-        while (ptr != NULL) {
-            if (ptr->roll == roll) {
-                cout << "\nRecord Found:\n";
-                cout << "Roll No: " << ptr->roll << endl;
-                cout << "Name   : " << ptr->name << endl;
-                cout << "Company: " << ptr->company << endl;
-                return;
-            }
-            ptr = ptr->next;
-        }
-        cout << "\nRecord Not Found!\n";
-    }
-
-    // Delete Record
-    void deleteRecord(int roll) {
-        int index = hashFunction(roll);
-        Student* ptr = table[index];
-        Student* prev = NULL;
-
-        while (ptr != NULL) {
-            if (ptr->roll == roll) {
-                if (prev == NULL) {
-                    table[index] = ptr->next;
-                } else {
-                    prev->next = ptr->next;
-                }
-                delete ptr;
-                count--;
-                cout << "Record Deleted Successfully!\n";
-                return;
-            }
-            prev = ptr;
-            ptr = ptr->next;
-        }
-        cout << "Record Not Found!\n";
-    }
-
-    // Display All Records
-    void display() {
-        cout << "\n--- Placement Records ---\n";
-        for (int i = 0; i < size; i++) {
-            cout << i << " -> ";
-            Student* ptr = table[i];
-            while (ptr != NULL) {
-                cout << "[" << ptr->roll << "|" << ptr->name << "|" << ptr->company << "] -> ";
-                ptr = ptr->next;
-            }
-            cout << "NULL\n";
-        }
-    }
+struct Student
+{
+    int roll;
+    char name[20];
+    char company[20];
+    Student *next;
 };
 
-int main() {
-    PlacementPortal portal;
-    int choice, roll;
-    string name, company;
+Student *table[SIZE];
 
-    do {
-        cout << "\n--- Smart Placement Portal ---\n";
-        cout << "1. Add Placement Record\n";
+/* Hash Function */
+int hashFunction(int roll)
+{
+    return roll % SIZE;
+}
+
+/* Insert Record */
+void insertRecord(int roll, char name[], char company[])
+{
+    int index = hashFunction(roll);
+
+    Student *t = new Student;
+    t->roll = roll;
+    strcpy(t->name, name);
+    strcpy(t->company, company);
+    t->next = NULL;
+
+    if (table[index] == NULL)
+        table[index] = t;
+    else
+    {
+        Student *p = table[index];
+        while (p->next != NULL)
+            p = p->next;
+        p->next = t;
+    }
+
+    cout << "Placement record inserted.\n";
+}
+
+/* Search Record */
+void searchRecord(int roll)
+{
+    int index = hashFunction(roll);
+    Student *p = table[index];
+
+    while (p != NULL)
+    {
+        if (p->roll == roll)
+        {
+            cout << "\nRecord Found\n";
+            cout << "Roll No : " << p->roll << endl;
+            cout << "Name    : " << p->name << endl;
+            cout << "Company : " << p->company << endl;
+            return;
+        }
+        p = p->next;
+    }
+    cout << "Record not found.\n";
+}
+
+/* Delete Record */
+void deleteRecord(int roll)
+{
+    int index = hashFunction(roll);
+    Student *p = table[index];
+    Student *prev = NULL;
+
+    while (p != NULL)
+    {
+        if (p->roll == roll)
+        {
+            if (prev == NULL)
+                table[index] = p->next;
+            else
+                prev->next = p->next;
+
+            delete p;
+            cout << "Record deleted successfully.\n";
+            return;
+        }
+        prev = p;
+        p = p->next;
+    }
+    cout << "Record not found.\n";
+}
+
+/* Display All Records */
+void display()
+{
+    int i;
+    cout << "\n--- Placement Records ---\n";
+    for (i = 0; i < SIZE; i++)
+    {
+        cout << i << " -> ";
+        Student *p = table[i];
+        while (p != NULL)
+        {
+            cout << "[" << p->roll << ", " << p->name
+                 << ", " << p->company << "] -> ";
+            p = p->next;
+        }
+        cout << "NULL\n";
+    }
+}
+
+/* MAIN */
+void main()
+{
+    int i, ch, roll;
+    char name[20], company[20];
+    clrscr();
+
+    for (i = 0; i < SIZE; i++)
+        table[i] = NULL;
+
+    do
+    {
+        cout << "\n--- SMART PLACEMENT PORTAL ---\n";
+        cout << "1. Insert Placement Record\n";
         cout << "2. Search Record\n";
         cout << "3. Delete Record\n";
-        cout << "4. Display All\n";
+        cout << "4. Display All Records\n";
         cout << "5. Exit\n";
         cout << "Enter choice: ";
-        cin >> choice;
+        cin >> ch;
 
-        switch (choice) {
-            case 1:
-                cout << "Enter Roll No: ";
-                cin >> roll;
-                cout << "Enter Name: ";
-                cin >> name;
-                cout << "Enter Company: ";
-                cin >> company;
-                portal.insert(roll, name, company);
-                cout << "Record Added.\n";
-                break;
-            case 2:
-                cout << "Enter Roll No to Search: ";
-                cin >> roll;
-                portal.search(roll);
-                break;
-            case 3:
-                cout << "Enter Roll No to Delete: ";
-                cin >> roll;
-                portal.deleteRecord(roll);
-                break;
-            case 4:
-                portal.display();
-                break;
+        switch (ch)
+        {
+        case 1:
+            cout << "Enter Roll No: ";
+            cin >> roll;
+            cout << "Enter Name: ";
+            cin >> name;
+            cout << "Enter Company: ";
+            cin >> company;
+            insertRecord(roll, name, company);
+            break;
+
+        case 2:
+            cout << "Enter Roll No to search: ";
+            cin >> roll;
+            searchRecord(roll);
+            break;
+
+        case 3:
+            cout << "Enter Roll No to delete: ";
+            cin >> roll;
+            deleteRecord(roll);
+            break;
+
+        case 4:
+            display();
+            break;
         }
-    } while (choice != 5);
+    } while (ch != 5);
 
-    return 0;
+    getch();
 }
 ```
 
