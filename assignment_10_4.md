@@ -6,102 +6,147 @@ Write a Program to implement Kruskal's algorithm to find the minimum spanning tr
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
 
-// Structure for edge linked list
-struct Edge {
-    int u, v, w;
-    Edge* next;
+#define MAXV 10
+#define MAXE 30
+
+/* Adjacency List Node */
+struct Node
+{
+    int v;
+    int w;
+    Node *next;
 };
 
-// Add edge to linked list
-void addEdge(Edge* &head, int u, int v, int w) {
-    Edge* newEdge = new Edge();
-    newEdge->u = u;
-    newEdge->v = v;
-    newEdge->w = w;
-    newEdge->next = head;
-    head = newEdge;
+/* Edge structure for Kruskal */
+struct Edge
+{
+    int u, v, w;
+};
+
+Node *adj[MAXV];
+Edge edges[MAXE];
+int parent[MAXV];
+int V, E, edgeCount = 0;
+
+/* Add edge to adjacency list */
+void addEdge(int u, int v, int w)
+{
+    Node *t = new Node;
+    t->v = v;
+    t->w = w;
+    t->next = adj[u];
+    adj[u] = t;
+
+    t = new Node;
+    t->v = u;
+    t->w = w;
+    t->next = adj[v];
+    adj[v] = t;
+
+    /* Store edge only once for Kruskal */
+    edges[edgeCount].u = u;
+    edges[edgeCount].v = v;
+    edges[edgeCount].w = w;
+    edgeCount++;
 }
 
-// Find parent (Disjoint Set)
-int find(int parent[], int i) {
-    if(parent[i] == i) {
-        return i;
-    }
-    return find(parent, parent[i]);
+/* Find parent (Union-Find) */
+int findParent(int parent[], int i)
+{
+    while (parent[i] != i)
+        i = parent[i];
+    return i;
 }
 
-// Union of two sets
-void unite(int parent[], int x, int y) {
-    int a = find(parent, x);
-    int b = find(parent, y);
-    parent[a] = b;
+/* Union two sets */
+void unionSet(int parent[], int a, int b)
+{
+    int x = findParent(parent, a);
+    int y = findParent(parent, b);
+    parent[x] = y;
 }
 
-// Sort edges by weight (Bubble Sort on linked list)
-void sortEdges(Edge* &head) {
-    Edge *i, *j;
-    for(i = head; i != NULL; i = i->next) {
-        for(j = i->next; j != NULL; j = j->next) {
-            if(i->w > j->w) {
-                swap(i->u, j->u);
-                swap(i->v, j->v);
-                swap(i->w, j->w);
+/* Sort edges by weight (Bubble Sort) */
+void sortEdges()
+{
+    int i, j;
+    Edge temp;
+
+    for (i = 0; i < edgeCount - 1; i++)
+    {
+        for (j = 0; j < edgeCount - i - 1; j++)
+        {
+            if (edges[j].w > edges[j + 1].w)
+            {
+                temp = edges[j];
+                edges[j] = edges[j + 1];
+                edges[j + 1] = temp;
             }
         }
     }
 }
 
-// Kruskal Algorithm
-void kruskal(Edge* head, int n) {
-    int parent[10];
-    for(int i = 0; i < n; i++) {
+/* Kruskal Algorithm */
+void kruskal()
+{
+    int i, count = 0, total = 0;
+
+    for (i = 0; i < V; i++)
         parent[i] = i;
-    }
 
-    sortEdges(head);
+    sortEdges();
 
-    cout << "\nEdges in Minimum Spanning Tree: \n";
-    int total = 0;
-    Edge* temp = head;
+    cout << "\nEdges in Minimum Spanning Tree:\n";
 
-    while(temp != NULL) {
-        int u = temp->u;
-        int v = temp->v;
+    for (i = 0; i < edgeCount && count < V - 1; i++)
+    {
+        int u = edges[i].u;
+        int v = edges[i].v;
 
-        if (find(parent, u) != find(parent, v)) {
-            cout << u << " - " << v << " : " << temp->w << endl;
-            total += temp->w;
-            unite(parent, u, v);
+        if (findParent(parent, u) != findParent(parent, v))
+        {
+            cout << u << " - " << v
+                 << "   Weight: " << edges[i].w << endl;
+
+            total += edges[i].w;
+            unionSet(parent, u, v);
+            count++;
         }
-        temp = temp->next;
     }
-    cout << "Total Cost = " << total << endl;
+
+    cout << "Total Minimum Cost = " << total << endl;
 }
 
-int main() {
-    int n, e, u, v, w;
-    Edge* head = NULL;
+/* MAIN */
+void main()
+{
+    int i, u, v, w;
+    clrscr();
 
     cout << "Enter number of vertices: ";
-    cin >> n;
+    cin >> V;
+
+    for (i = 0; i < V; i++)
+        adj[i] = NULL;
 
     cout << "Enter number of edges: ";
-    cin >> e;
+    cin >> E;
 
     cout << "Enter edges (u v weight):\n";
-    for(int i = 0; i < e; i++) {
+    for (i = 0; i < E; i++)
+    {
         cin >> u >> v >> w;
-        addEdge(head, u, v, w);
+        addEdge(u, v, w);
     }
 
-    kruskal(head, n);
+    kruskal();
 
-    return 0;
+    getch();
 }
-```
+``
 
 ## Output
 
