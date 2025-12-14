@@ -9,97 +9,102 @@ A string is considered balanced if:
 ## Code
 
 ```cpp
-#include <iostream>
-#include <string>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
 
-typedef struct node {
+/* Node structure */
+struct Node
+{
     char data;
-    struct node* next;
-} STACK;
+    Node *next;
+};
 
-// Create node
-STACK* createNode(char c) {
-    STACK* n = new STACK;
-    n->data = c;
-    n->next = NULL;
-    return n;
+/* Stack top */
+Node *top = NULL;
+
+/* Push */
+void push(char c)
+{
+    Node *t = new Node;
+    t->data = c;
+    t->next = top;
+    top = t;
 }
 
-// Push character onto stack
-STACK* push(STACK* top, char c) {
-    STACK* n = createNode(c);
-    n->next = top;
-    return n; // new top
+/* Pop */
+char pop()
+{
+    Node *t;
+    char c;
+
+    if (top == NULL)
+        return '\0';
+
+    t = top;
+    c = t->data;
+    top = t->next;
+    delete t;
+    return c;
 }
 
-// Pop character from stack
-STACK* pop(STACK* top, char &popped) {
-    if (!top) {
-        popped = '\0';
-        return NULL;
-    }
-    STACK* temp = top;
-    popped = temp->data;
-    top = top->next;
-    delete temp;
-    return top;
+/* Check matching pair */
+int isMatch(char open, char close)
+{
+    if (open == '(' && close == ')') return 1;
+    if (open == '{' && close == '}') return 1;
+    if (open == '[' && close == ']') return 1;
+    return 0;
 }
 
-// Check if stack is empty
-bool isEmpty(STACK* top) {
-    return (top == NULL);
-}
+void main()
+{
+    char exp[50];
+    int balanced = 1;
+    int i;
+    char ch, open;
 
-// Check if closing bracket matches last opening bracket
-bool isMatching(char open, char close) {
-    return ((open == '(' && close == ')') ||
-            (open == '{' && close == '}') ||
-            (open == '[' && close == ']'));
-}
+    clrscr();
 
-int main() {
-    string s;
-    cout << "Enter string of parentheses: ";
-    cin >> s;
+    cout << "Enter expression: ";
+    cin >> exp;
 
-    STACK* top = NULL;
-    bool balanced = true;
+    for (i = 0; exp[i] != '\0'; i++)
+    {
+        ch = exp[i];
 
-    for (int i = 0; i < s.length(); i++) {
-        char ch = s[i];
+        /* Opening bracket */
+        if (ch == '(' || ch == '{' || ch == '[')
+            push(ch);
 
-        // If opening bracket push
-        if (ch == '(' || ch == '{' || ch == '[') {
-            top = push(top, ch);
-        }
-        // If closing bracket pop and match
-        else if (ch == ')' || ch == '}' || ch == ']') {
-            if (isEmpty(top)) {
-                // nothing to match
-                balanced = false;
+        /* Closing bracket */
+        else if (ch == ')' || ch == '}' || ch == ']')
+        {
+            if (top == NULL)
+            {
+                balanced = 0;
                 break;
             }
-            char open;
-            top = pop(top, open);
-            
-            if (!isMatching(open, ch)) {
-                balanced = false;
+
+            open = pop();
+
+            if (!isMatch(open, ch))
+            {
+                balanced = 0;
                 break;
             }
         }
     }
 
-    // After processing all characters, stack must be empty
-    if (!isEmpty(top))
-        balanced = false;
+    /* Stack should be empty */
+    if (top != NULL)
+        balanced = 0;
 
     if (balanced)
-        cout << "Balanced\n";
+        cout << "Balanced";
     else
-        cout << "Not Balanced\n";
+        cout << "Not Balanced";
 
-    return 0;
+    getch();
 }
 ```
 
