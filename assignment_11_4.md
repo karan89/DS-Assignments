@@ -6,105 +6,135 @@ Store and retrieve student records using roll numbers.
 ## Code
 
 ```cpp
-#include <iostream>
-#include <string>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
+#include <string.h>
 
-#define SIZE 10
-
-// Structure for Student
-struct Student {
+struct Node
+{
     int roll;
-    string name;
-    Student* next;
+    char name[20];
+    Node *next;
 };
 
-// Hash table
-Student* table[SIZE];
+Node *table[20];
+int SIZE;
 
-// Hash function
-int hashFunction(int roll) {
+/* Hash Function */
+int hashFunction(int roll)
+{
     return roll % SIZE;
 }
 
-// Insert student record
-void insertStudent(int roll, string name) {
+/* Insert Student */
+void insertStudent(int roll, char name[])
+{
     int index = hashFunction(roll);
-    
-    Student* newNode = new Student();
-    newNode->roll = roll;
-    newNode->name = name;
-    newNode->next = table[index]; // Separate chaining insert at head
-    table[index] = newNode;
+
+    Node *t = new Node;
+    t->roll = roll;
+    strcpy(t->name, name);
+    t->next = NULL;
+
+    if (table[index] == NULL)
+        table[index] = t;
+    else
+    {
+        Node *p = table[index];
+        while (p->next != NULL)
+            p = p->next;
+        p->next = t;
+    }
+
+    cout << "Student record inserted.\n";
 }
 
-// Search student by roll number
-void searchStudent(int roll) {
+/* Search Student */
+void searchStudent(int roll)
+{
     int index = hashFunction(roll);
-    Student* temp = table[index];
-    
-    while(temp != NULL) {
-        if(temp->roll == roll) {
-            cout << "\nStudent Found:";
-            cout << "\nRoll No: " << temp->roll;
-            cout << "\nName   : " << temp->name << endl;
+    Node *p = table[index];
+
+    while (p != NULL)
+    {
+        if (p->roll == roll)
+        {
+            cout << "\nStudent Found\n";
+            cout << "Roll No: " << p->roll << endl;
+            cout << "Name   : " << p->name << endl;
             return;
         }
-        temp = temp->next;
+        p = p->next;
     }
-    cout << "\nStudent Record Not Found!" << endl;
+    cout << "Student not found.\n";
 }
 
-// Display all records
-void displayAll() {
-    cout << "\nStudent Records: \n";
-    for(int i = 0; i < SIZE; i++) {
-        Student* temp = table[i];
-        while(temp != NULL) {
-            cout << "Roll: " << temp->roll << " Name: " << temp->name << endl;
-            temp = temp->next;
+/* Display Hash Table */
+void display()
+{
+    int i;
+    cout << "\n--- HASH TABLE ---\n";
+    for (i = 0; i < SIZE; i++)
+    {
+        cout << i << " -> ";
+        Node *p = table[i];
+        while (p != NULL)
+        {
+            cout << "[" << p->roll << ", " << p->name << "] -> ";
+            p = p->next;
         }
+        cout << "NULL\n";
     }
 }
 
-int main() {
-    int choice, roll;
-    string name;
+/* MAIN */
+void main()
+{
+    int ch, roll, i;
+    char name[20];
+    clrscr();
 
-    // Initialize table
-    for(int i = 0; i < SIZE; i++) {
+    cout << "Enter hash table size (max 20): ";
+    cin >> SIZE;
+
+    for (i = 0; i < SIZE; i++)
         table[i] = NULL;
-    }
 
-    do {
-        cout << "\n1. Insert Student";
-        cout << "\n2. Search Student";
-        cout << "\n3. Display All";
-        cout << "\n4. Exit";
-        cout << "\nEnter choice: ";
-        cin >> choice;
+    do
+    {
+        cout << "\n--- MENU ---\n";
+        cout << "1. Insert Student\n";
+        cout << "2. Search Student\n";
+        cout << "3. Display All Records\n";
+        cout << "4. Exit\n";
+        cout << "Enter choice: ";
+        cin >> ch;
 
-        switch(choice) {
-            case 1:
-                cout << "Enter Roll Number: ";
-                cin >> roll;
-                cout << "Enter Name: ";
-                cin >> name;
-                insertStudent(roll, name);
-                break;
-            case 2:
-                cout << "Enter Roll Number to search: ";
-                cin >> roll;
-                searchStudent(roll);
-                break;
-            case 3:
-                displayAll();
-                break;
+        switch (ch)
+        {
+        case 1:
+            cout << "Enter Roll Number: ";
+            cin >> roll;
+            cout << "Enter Name: ";
+            cin >> name;
+            insertStudent(roll, name);
+            break;
+
+        case 2:
+            cout << "Enter Roll Number to search: ";
+            cin >> roll;
+            searchStudent(roll);
+            break;
+
+        case 3:
+            display();
+            break;
         }
-    } while(choice != 4);
+    } while (ch != 4);
 
-    return 0;
+    getch();
 }
+
 ```
 
 ## Output
