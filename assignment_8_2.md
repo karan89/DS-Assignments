@@ -6,145 +6,158 @@ Write a program to illustrate operations on a BST with numeric keys: Insert, Del
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
 
-typedef struct node {
-    int key;
-    struct node* left;
-    struct node* right;
-} BST;
+struct Node
+{
+    int data;
+    Node *left;
+    Node *right;
+};
 
-BST* createNode(int k) {
-    BST* p = new BST;
-    p->key = k;
-    p->left = p->right = NULL;
-    return p;
+Node *root = NULL;
+
+/* Create Node */
+Node* createNode(int x)
+{
+    Node *t = new Node;
+    t->data = x;
+    t->left = t->right = NULL;
+    return t;
 }
 
-BST* insertNode(BST* root, int k) {
-    if (root == NULL) return createNode(k);
-    
-    if (k < root->key)
-        root->left = insertNode(root->left, k);
-    else if (k > root->key)
-        root->right = insertNode(root->right, k);
+/* Insert Node */
+Node* insert(Node *r, int x)
+{
+    if (r == NULL)
+        return createNode(x);
+
+    if (x < r->data)
+        r->left = insert(r->left, x);
+    else if (x > r->data)
+        r->right = insert(r->right, x);
     else
-        cout << "Key " << k << " already exists. Ignored.\n";
-        
-    return root;
+        cout << "Duplicate value not allowed\n";
+
+    return r;
 }
 
-bool searchNode(BST* root, int k) {
-    if (!root) return false;
-    if (k == root->key) return true;
-    if (k < root->key) return searchNode(root->left, k);
-    return searchNode(root->right, k);
+/* Search Node */
+void search(Node *r, int x)
+{
+    if (r == NULL)
+        cout << "Key NOT FOUND\n";
+    else if (r->data == x)
+        cout << "Key FOUND\n";
+    else if (x < r->data)
+        search(r->left, x);
+    else
+        search(r->right, x);
 }
 
-BST* findMin(BST* root) {
-    while (root && root->left)
-        root = root->left;
-    return root;
+/* Find Minimum */
+Node* findMin(Node *r)
+{
+    while (r->left != NULL)
+        r = r->left;
+    return r;
 }
 
-BST* deleteNode(BST* root, int k) {
-    if (!root) {
-        cout << "Key not found.\n";
-        return NULL;
+/* Delete Node */
+Node* del(Node *r, int x)
+{
+    if (r == NULL)
+    {
+        cout << "Key not found\n";
+        return r;
     }
-    
-    if (k < root->key)
-        root->left = deleteNode(root->left, k);
-    else if (k > root->key)
-        root->right = deleteNode(root->right, k);
-    else {
-        // Node found
-        if (!root->left && !root->right) {
-            delete root;
-            return NULL;
-        }
-        else if (!root->left) {
-            BST* temp = root->right;
-            delete root;
+
+    if (x < r->data)
+        r->left = del(r->left, x);
+    else if (x > r->data)
+        r->right = del(r->right, x);
+    else
+    {
+        // Case 1: No child or 1 child
+        if (r->left == NULL)
+        {
+            Node *temp = r->right;
+            delete r;
             return temp;
         }
-        else if (!root->right) {
-            BST* temp = root->left;
-            delete root;
+        else if (r->right == NULL)
+        {
+            Node *temp = r->left;
+            delete r;
             return temp;
         }
-        else {
-            BST* succ = findMin(root->right);
-            root->key = succ->key;
-            root->right = deleteNode(root->right, succ->key);
-        }
+
+        // Case 2: 2 children
+        Node *t = findMin(r->right);
+        r->data = t->data;
+        r->right = del(r->right, t->data);
     }
-    return root;
+    return r;
 }
 
-void inorder(BST* root) {
-    if (!root) return;
-    inorder(root->left);
-    cout << root->key << " ";
-    inorder(root->right);
+/* Inorder Traversal */
+void inorder(Node *r)
+{
+    if (r != NULL)
+    {
+        inorder(r->left);
+        cout << r->data << " ";
+        inorder(r->right);
+    }
 }
 
-void freeTree(BST* root) {
-    if (!root) return;
-    freeTree(root->left);
-    freeTree(root->right);
-    delete root;
-}
+/* MAIN */
+void main()
+{
+    int ch, x;
+    clrscr();
 
-int main() {
-    BST* root = NULL;
-    int choice, key;
-    cout << "=== BST Operations: Insert | Delete | Find | Show ===\n";
-    do {
-        cout << "\nMenu:\n";
-        cout << "1. Insert key\n";
-        cout << "2. Delete key\n";
-        cout << "3. Find key\n";
-        cout << "4. Show (Inorder Traversal)\n";
+    do
+    {
+        cout << "\n--- BST MENU ---\n";
+        cout << "1. Insert\n";
+        cout << "2. Delete\n";
+        cout << "3. Search\n";
+        cout << "4. Display (Inorder)\n";
         cout << "5. Exit\n";
         cout << "Enter choice: ";
-        cin >> choice;
+        cin >> ch;
 
-        switch (choice) {
-            case 1:
-                cout << "Enter key to insert: ";
-                cin >> key;
-                root = insertNode(root, key);
-                break;
-            case 2:
-                cout << "Enter key to delete: ";
-                cin >> key;
-                root = deleteNode(root, key);
-                break;
-            case 3:
-                cout << "Enter key to search: ";
-                cin >> key;
-                if (searchNode(root, key))
-                    cout << "Key FOUND in BST.\n";
-                else
-                    cout << "Key NOT FOUND.\n";
-                break;
-            case 4:
-                cout << "BST (Inorder): ";
-                inorder(root);
-                cout << "\n";
-                break;
-            case 5:
-                cout << "Exiting...\n";
-                freeTree(root);
-                break;
-            default:
-                cout << "Invalid choice.\n";
+        switch (ch)
+        {
+        case 1:
+            cout << "Enter value: ";
+            cin >> x;
+            root = insert(root, x);
+            break;
+
+        case 2:
+            cout << "Enter value to delete: ";
+            cin >> x;
+            root = del(root, x);
+            break;
+
+        case 3:
+            cout << "Enter value to search: ";
+            cin >> x;
+            search(root, x);
+            break;
+
+        case 4:
+            cout << "BST Inorder: ";
+            inorder(root);
+            cout << endl;
+            break;
         }
-    } while (choice != 5);
-    
-    return 0;
+    } while (ch != 5);
+
+    getch();
 }
 ```
 
