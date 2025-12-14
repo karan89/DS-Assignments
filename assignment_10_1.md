@@ -6,103 +6,125 @@ Write a Program to implement Kruskal's algorithm to find the minimum spanning tr
 ## Code
 
 ```cpp
-#include <iostream>
-#include <algorithm>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
 
-struct Edge {
-    int src, dest, weight;
-    Edge* next;
+#define MAX 20
+
+struct Edge
+{
+    int src;
+    int dest;
+    int weight;
+    Edge *next;
 };
 
-void addEdge(Edge*& head, int s, int d, int w) {
-    Edge* newNode = new Edge();
-    newNode->src = s;
-    newNode->dest = d;
-    newNode->weight = w;
-    newNode->next = head;
-    head = newNode;
+/* Add edge to linked list */
+void addEdge(Edge* &head, int s, int d, int w)
+{
+    Edge *t = new Edge;
+    t->src = s;
+    t->dest = d;
+    t->weight = w;
+    t->next = head;
+    head = t;
 }
 
-int findParent(int parent[], int i) {
-    while (parent[i] != i) {
+/* Find parent */
+int findParent(int parent[], int i)
+{
+    while (parent[i] != i)
         i = parent[i];
-    }
     return i;
 }
 
-void unionSet(int parent[], int a, int b) {
+/* Union sets */
+void unionSet(int parent[], int a, int b)
+{
     int x = findParent(parent, a);
     int y = findParent(parent, b);
     parent[x] = y;
 }
 
-void sortEdges(Edge*& head) {
-    for (Edge* i = head; i != NULL; i = i->next) {
-        for (Edge* j = i->next; j != NULL; j = j->next) {
-            if (i->weight > j->weight) {
-                swap(i->src, j->src);
-                swap(i->dest, j->dest);
-                swap(i->weight, j->weight);
+/* Sort edges by weight (Bubble sort on linked list) */
+void sortEdges(Edge *head)
+{
+    Edge *i, *j;
+    int t;
+
+    for (i = head; i != NULL; i = i->next)
+    {
+        for (j = i->next; j != NULL; j = j->next)
+        {
+            if (i->weight > j->weight)
+            {
+                t = i->weight; i->weight = j->weight; j->weight = t;
+                t = i->src;    i->src    = j->src;    j->src    = t;
+                t = i->dest;   i->dest   = j->dest;   j->dest   = t;
             }
         }
     }
 }
 
-int main() {
-    int n;
+/* MAIN */
+void main()
+{
+    int n, i, j;
+    int graph[MAX][MAX];
+    Edge *edgeList = NULL;
+    Edge *p;
+    int parent[MAX];
+    int count = 0, total = 0;
+    
+    clrscr();
+
     cout << "Enter number of vertices: ";
     cin >> n;
 
-    int graph[20][20];
-    cout << "Enter Adjacency Matrix: \n";
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
+    cout << "Enter adjacency matrix:\n";
+    for (i = 0; i < n; i++)
+        for (j = 0; j < n; j++)
             cin >> graph[i][j];
-        }
-    }
 
-    Edge* edgeList = NULL;
-
-    // Convert adjacency matrix to edge list (linked list)
-    // Only iterate upper triangle to avoid duplicates in undirected graph
-    for (int i = 0; i < n; i++) {
-        for (int j = i + 1; j < n; j++) {
-            if (graph[i][j] != 0) {
+    /* Convert adjacency matrix to edge list */
+    for (i = 0; i < n; i++)
+    {
+        for (j = i + 1; j < n; j++)
+        {
+            if (graph[i][j] != 0)
                 addEdge(edgeList, i, j, graph[i][j]);
-            }
         }
     }
 
     sortEdges(edgeList);
 
-    int parent[20];
-    for (int i = 0; i < n; i++) {
+    for (i = 0; i < n; i++)
         parent[i] = i;
-    }
 
-    cout << "\nEdges in Minimum Spanning Tree: \n";
-    int edgeCount = 0;
-    int totalCost = 0;
-    Edge* temp = edgeList;
+    cout << "\nEdges in Minimum Spanning Tree:\n";
+    p = edgeList;
 
-    while (temp != NULL && edgeCount < n - 1) {
-        int u = temp->src;
-        int v = temp->dest;
+    while (p != NULL && count < n - 1)
+    {
+        int u = p->src;
+        int v = p->dest;
 
-        if (findParent(parent, u) != findParent(parent, v)) {
-            cout << u << " - " << v << " : " << temp->weight << endl;
-            totalCost += temp->weight;
+        if (findParent(parent, u) != findParent(parent, v))
+        {
+            cout << u << " - " << v
+                 << "   Weight: " << p->weight << endl;
+            total += p->weight;
             unionSet(parent, u, v);
-            edgeCount++;
+            count++;
         }
-        temp = temp->next;
+        p = p->next;
     }
-    
-    cout << "Total Minimum Cost = " << totalCost << endl;
 
-    return 0;
+    cout << "Total Minimum Cost = " << total << endl;
+
+    getch();
 }
+
 ```
 
 ## Output
