@@ -12,121 +12,116 @@ Implement the following operations:
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+#include<iostream.h>
+#include<conio.h>
 
-typedef struct node {
+struct Node
+{
     int price;
-    struct node* next;
-} STACK;
+    Node *next;
+};
 
-// create new node
-STACK* createNode(int x) {
-    STACK* p = new STACK;
-    p->price = x;
-    p->next = NULL;
-    return p;
+Node *top = NULL;
+
+/* record(price) -> push */
+void record(int price)
+{
+    Node *temp = new Node;
+    temp->price = price;
+    temp->next = top;
+    top = temp;
 }
 
-// 1. record(price) -> push
-STACK* recordPrice(STACK* top, int price) {
-    STACK* node = createNode(price);
-    node->next = top; // push on top
-    return node; // new top
-}
-
-// 2. remove() -> pop and return removed price
-STACK* removePrice(STACK* top, int &removedPrice) {
-    if (!top) {
-        cout << "Stack Empty. No price to remove.\n";
-        removedPrice = -1;
-        return NULL;
-    }
-    STACK* temp = top;
-    removedPrice = temp->price;
-    top = top->next;
-    delete temp;
-    return top; // new top
-}
-
-// 3. latest() -> peek top value
-int latest(STACK* top) {
-    if (!top) {
-        cout << "No latest price. Stack empty.\n";
-        return -1;
-    }
-    return top->price;
-}
-
-// 4. isEmpty()
-bool isEmpty(STACK* top) {
-    return (top == NULL);
-}
-
-// display stack (for testing)
-void display(STACK* top) {
-    if (!top) {
-        cout << "(empty)\n";
+/* remove() -> pop */
+void removePrice()
+{
+    if (top == NULL)
+    {
+        cout << "Stack Empty\n";
         return;
     }
-    STACK* cur = top;
-    cout << "Prices (top to bottom): ";
-    while (cur) {
-        cout << cur->price << " ";
-        cur = cur->next;
-    }
-    cout << "\n";
+
+    Node *temp = top;
+    cout << "Removed price: " << top->price << endl;
+    top = top->next;
+    delete temp;
 }
 
-int main() {
-    STACK* top = NULL;
-    int choice, price, removed;
+/* latest() -> peek */
+void latest()
+{
+    if (top == NULL)
+        cout << "No prices recorded\n";
+    else
+        cout << "Latest price: " << top->price << endl;
+}
 
-    do {
-        cout << "\n-- MENU --\n";
-        cout << "1. Record new price\n";
-        cout << "2. Remove most recent price\n";
-        cout << "3. Show latest price\n";
-        cout << "4. Check if empty\n";
-        cout << "5. Display all prices\n";
-        cout << "6. Exit\n";
+/* isEmpty() */
+void isEmpty()
+{
+    if (top == NULL)
+        cout << "Stack is Empty\n";
+    else
+        cout << "Stack is NOT Empty\n";
+}
+
+/* Display stack */
+void display()
+{
+    Node *t = top;
+    if (top == NULL)
+    {
+        cout << "No prices to display\n";
+        return;
+    }
+
+    cout << "Prices: ";
+    while (t != NULL)
+    {
+        cout << t->price << " ";
+        t = t->next;
+    }
+    cout << endl;
+}
+
+/* -------- MAIN -------- */
+void main()
+{
+    int ch, price;
+    clrscr();
+
+    do
+    {
+        cout << "\n1.Record Price\n2.Remove Price\n3.Latest Price\n4.Is Empty\n5.Display\n6.Exit\n";
         cout << "Enter choice: ";
-        cin >> choice;
+        cin >> ch;
 
-        switch (choice) {
+        switch (ch)
+        {
             case 1:
                 cout << "Enter price: ";
                 cin >> price;
-                top = recordPrice(top, price);
+                record(price);
                 break;
-            case 2:
-                top = removePrice(top, removed);
-                if (removed != -1)
-                    cout << "Removed price: " << removed << "\n";
-                break;
-            case 3:
-                price = latest(top);
-                if (price != -1)
-                    cout << "Latest price: " << price << "\n";
-                break;
-            case 4:
-                if (isEmpty(top))
-                    cout << "No prices recorded. Stack Empty.\n";
-                else
-                    cout << "Stack is NOT empty.\n";
-                break;
-            case 5:
-                display(top);
-                break;
-            case 6:
-                cout << "Exiting...\n";
-                break;
-            default:
-                cout << "Invalid choice.\n";
-        }
-    } while (choice != 6);
 
-    return 0;
+            case 2:
+                removePrice();
+                break;
+
+            case 3:
+                latest();
+                break;
+
+            case 4:
+                isEmpty();
+                break;
+
+            case 5:
+                display();
+                break;
+        }
+
+    } while (ch != 6);
 }
 ```
 
