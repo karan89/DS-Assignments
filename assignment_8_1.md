@@ -6,226 +6,152 @@ Write a program using Trees to assign roll numbers to students based on their pr
 ## Code
 
 ```cpp
-#include <iostream>
-#include <string>
-#include <limits>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
+#include <string.h>
 
-typedef struct sNode {
-    string name;
-    struct sNode* next;
-} SNode;
+struct Student
+{
+    char name[20];
+    Student *next;
+};
 
-typedef struct bstNode {
+struct BST
+{
     int marks;
-    SNode* students; // Linked list of students with the same marks
-    struct bstNode* left;
-    struct bstNode* right;
-} BSTNode;
+    Student *list;
+    BST *left, *right;
+};
 
-typedef struct aNode {
-    int roll;
-    string name;
-    int marks;
-    struct aNode* next;
-} ANode;
+BST *root = NULL;
+int roll = 1;
 
-SNode* createStudentNode(const string &name) {
-    SNode* p = new SNode;
-    p->name = name;
-    p->next = NULL;
-    return p;
+/* Create student node */
+Student* createStudent(char name[])
+{
+    Student *t = new Student;
+    strcpy(t->name, name);
+    t->next = NULL;
+    return t;
 }
 
-BSTNode* createBSTNode(int marks, const string &name) {
-    BSTNode* p = new BSTNode;
-    p->marks = marks;
-    p->students = createStudentNode(name);
-    p->left = p->right = NULL;
-    return p;
+/* Create BST node */
+BST* createBST(int marks, char name[])
+{
+    BST *t = new BST;
+    t->marks = marks;
+    t->list = createStudent(name);
+    t->left = t->right = NULL;
+    return t;
 }
 
-ANode* createAssignedNode(int roll, const string &name, int marks) {
-    ANode* p = new ANode;
-    p->roll = roll;
-    p->name = name;
-    p->marks = marks;
-    p->next = NULL;
-    return p;
-}
+/* Insert student */
+BST* insert(BST *r, int marks, char name[])
+{
+    if (r == NULL)
+        return createBST(marks, name);
 
-BSTNode* insertStudent(BSTNode* root, const string &name, int marks) {
-    if (!root) return createBSTNode(marks, name);
-
-    if (marks < root->marks) 
-        root->left = insertStudent(root->left, name, marks);
-    else if (marks > root->marks) 
-        root->right = insertStudent(root->right, name, marks);
-    else {
-        // Same marks, append to linked list
-        SNode* cur = root->students;
-        while (cur->next) cur = cur->next;
-        cur->next = createStudentNode(name);
+    if (marks < r->marks)
+        r->left = insert(r->left, marks, name);
+    else if (marks > r->marks)
+        r->right = insert(r->right, marks, name);
+    else
+    {
+        Student *s = r->list;
+        while (s->next != NULL)
+            s = s->next;
+        s->next = createStudent(name);
     }
-    return root;
+    return r;
 }
 
-// Reverse Inorder Traversal (Right -> Root -> Left) to assign rolls from highest marks to lowest
-void assignRollsReverseInorder(BSTNode* root, ANode*& assignedHead, ANode*& assignedTail, int &rollCounter) {
-    if (!root) return;
+/* Assign roll numbers (reverse inorder: Descending marks) */
+void assignRoll(BST *r)
+{
+    if (r != NULL)
+    {
+        // Visit right (higher marks) first
+        assignRoll(r->right);
 
-    assignRollsReverseInorder(root->right, assignedHead, assignedTail, rollCounter);
-    
-    SNode* s = root->students;
-    while (s) {
-        ANode* an = createAssignedNode(++rollCounter, s->name, root->marks);
-        if (!assignedHead) {
-            assignedHead = assignedTail = an;
-        } else {
-            assignedTail->next = an;
-            assignedTail = an;
+        Student *s = r->list;
+        while (s != NULL)
+        {
+            cout << "Roll No: " << roll++
+                 << "  Name: " << s->name
+                 << "  Marks: " << r->marks << endl;
+            s = s->next;
         }
-        s = s->next;
-    }
 
-    assignRollsReverseInorder(root->left, assignedHead, assignedTail, rollCounter);
-}
-
-void displayAssignedList(ANode* head) {
-    if (!head) {
-        cout << "No assignments yet. Please 'Assign Roll Numbers' first.\n";
-        return;
-    }
-    cout << "\nAssigned Roll Numbers (roll -> name -> marks):\n";
-    ANode* cur = head;
-    while (cur) {
-        cout << cur->roll << " -> " << cur->name << " -> " << cur->marks << "\n";
-        cur = cur->next;
+        assignRoll(r->left);
     }
 }
 
-void displayMarksGroups(BSTNode* root) {
-    if (!root) return;
-    displayMarksGroups(root->left);
-    cout << "Marks = " << root->marks << ": ";
-    SNode* s = root->students;
-    bool first = true;
-    while (s) {
-        if (!first) cout << ", ";
-        cout << s->name;
-        first = false;
-        s = s->next;
-    }
-    cout << "\n";
-    displayMarksGroups(root->right);
-}
-
-void freeAssignedList(ANode* head) {
-    while (head) {
-        ANode* t = head;
-        head = head->next;
-        delete t;
+/* Display marks-wise grouping (Inorder) */
+void display(BST *r)
+{
+    if (r != NULL)
+    {
+        display(r->left);
+        cout << "Marks " << r->marks << " : ";
+        Student *s = r->list;
+        while (s != NULL)
+        {
+            cout << s->name << " ";
+            s = s->next;
+        }
+        cout << endl;
+        display(r->right);
     }
 }
 
-void freeStudentList(SNode* head) {
-    while (head) {
-        SNode* t = head;
-        head = head->next;
-        delete t;
-    }
-}
+/* MAIN */
+void main()
+{
+    int ch, marks;
+    char name[20];
+    clrscr();
 
-void freeBST(BSTNode* root) {
-    if (!root) return;
-    freeBST(root->left);
-    freeBST(root->right);
-    freeStudentList(root->students);
-    delete root;
-}
-
-int main() {
-    BSTNode* root = NULL;
-    ANode* assignedHead = NULL;
-    ANode* assignedTail = NULL;
-    int choice;
-
-    cout << "=== Assign Roll Numbers by Previous Year Results (Topper Roll 1) ===\n";
-
-    do {
-        cout << "\nMenu:\n";
-        cout << "1. Add student (name and marks)\n";
-        cout << "2. Display marks groups (BST nodes)\n";
-        cout << "3. Assign roll numbers now and display assignments\n";
-        cout << "4. Clear assigned list\n";
-        cout << "5. Exit\n";
+    do
+    {
+        cout << "\n--- MENU ---\n";
+        cout << "1. Add Student\n";
+        cout << "2. Display Marks Groups\n";
+        cout << "3. Assign Roll Numbers\n";
+        cout << "4. Exit\n";
         cout << "Enter choice: ";
-        cin >> choice;
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cin >> ch;
 
-        if (choice == 1) {
-            string name;
-            int marks;
-            cout << "Enter student name: ";
-            getline(cin, name);
-            if (name.empty()) {
-                cout << "Name cannot be empty.\n";
-                continue;
-            }
-            cout << "Enter marks (integer): ";
+        switch (ch)
+        {
+        case 1:
+            cout << "Enter Name: ";
+            cin >> name;
+            cout << "Enter Marks: ";
             cin >> marks;
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            root = insert(root, marks, name);
+            break;
 
-            root = insertStudent(root, name, marks);
-            cout << "Added student: " << name << " with marks " << marks << ".\n";
-            
-            // Invalidate assignments if new student added
-            if (assignedHead) {
-                freeAssignedList(assignedHead);
-                assignedHead = assignedTail = NULL;
-                cout << "(Previous assignments cleared due to new entry.)\n";
-            }
-        }
-        else if (choice == 2) {
-            if (!root) cout << "No students added yet.\n";
-            else {
-                cout << "\nMarks groups (ascending marks):\n";
-                displayMarksGroups(root);
-            }
-        }
-        else if (choice == 3) {
-            if (!root) {
+        case 2:
+            if (root == NULL)
+                cout << "No students added.\n";
+            else
+                display(root);
+            break;
+
+        case 3:
+            if (root == NULL)
                 cout << "No students to assign.\n";
-                continue;
+            else
+            {
+                roll = 1;
+                cout << "\nAssigned Roll Numbers:\n";
+                assignRoll(root);
             }
-            if (assignedHead) {
-                freeAssignedList(assignedHead);
-                assignedHead = assignedTail = NULL;
-            }
-            int rollCounter = 0;
-            assignRollsReverseInorder(root, assignedHead, assignedTail, rollCounter);
-            cout << "Assigned " << rollCounter << " roll numbers.\n";
-            displayAssignedList(assignedHead);
+            break;
         }
-        else if (choice == 4) {
-            if (!assignedHead) cout << "No existing assignments to clear.\n";
-            else {
-                freeAssignedList(assignedHead);
-                assignedHead = assignedTail = NULL;
-                cout << "Cleared assigned list.\n";
-            }
-        }
-        else if (choice == 5) {
-            cout << "Exiting. Freeing memory.\n";
-            freeAssignedList(assignedHead);
-            freeBST(root);
-        }
-        else {
-            cout << "Invalid choice.\n";
-        }
-    } while (choice != 5);
+    } while (ch != 4);
 
-    return 0;
+    getch();
 }
 ```
 
