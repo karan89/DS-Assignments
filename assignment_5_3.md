@@ -7,165 +7,128 @@ A. Push B. Pop C. Stack Overflow D. Stack Underflow E. Display.
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+#include<iostream.h>
+#include<conio.h>
+#include<stdlib.h>
 
-int main() {
-    int N, k;
-    cout << "Enter total array size N: ";
-    cin >> N;
-    cout << "Enter number of stacks k (>1): ";
+/* Node structure */
+struct Node {
+    int data;
+    Node *next;
+};
+
+/* Array of stack tops */
+Node *top[10];
+
+/* Push operation */
+void push(int s, int x)
+{
+    Node *temp = new Node;
+    temp->data = x;
+    temp->next = top[s];
+    top[s] = temp;
+}
+
+/* Pop operation */
+void pop(int s)
+{
+    if (top[s] == NULL)
+    {
+        cout << "Stack Underflow\n";
+        return;
+    }
+    Node *t = top[s];
+    cout << "Popped element: " << t->data << endl;
+    top[s] = t->next;
+    delete t;
+}
+
+/* Display all stacks */
+void display(int k)
+{
+    int i;
+    Node *temp;
+    for (i = 0; i < k; i++)
+    {
+        cout << "Stack " << i + 1 << ": ";
+        temp = top[i];
+        if (temp == NULL)
+        {
+            cout << "Empty";
+        }
+        else
+        {
+            while (temp != NULL)
+            {
+                cout << temp->data << " ";
+                temp = temp->next;
+            }
+        }
+        cout << endl;
+    }
+}
+
+/* ---------- MAIN ---------- */
+void main()
+{
+    int k, ch, s, x, i;
+    clrscr();
+
+    cout << "Enter number of stacks (<=10): ";
     cin >> k;
 
-    if (k <= 1) {
-        cout << "Number of stacks should be > 1. Exiting.\n";
-        return 0;
-    }
-    if (N < k) {
-        cout << "Array size must be >= number of stacks. Exiting.\n";
-        return 0;
+    if (k > 10)
+    {
+        cout << "Invalid number of stacks";
+        return;
     }
 
-    // allocate array and metadata
-    int* arr = new int[N];
-    int* baseIndex = new int[k];
-    int* capacity = new int[k];
-    int* topIndex = new int[k];
+    /* Initialize all stacks as empty */
+    for (i = 0; i < k; i++)
+        top[i] = NULL;
 
-    int baseCap = N / k;
-    int rem = N % k;
-
-    // compute capacities and base indices
-    int idx = 0;
-    for (int i = 0; i < k; ++i) {
-        capacity[i] = baseCap + (i < rem ? 1 : 0);
-        baseIndex[i] = idx;
-        // initialize top to one position below base (empty)
-        topIndex[i] = baseIndex[i] - 1;
-        idx = idx + capacity[i];
-    }
-
-    cout << "\nConfiguration:\n";
-    cout << "Total size N = " << N << ", stacks k = " << k << "\n";
-    for (int i = 0; i < k; ++i) {
-        cout << "Stack " << i + 1 << ": base = " << baseIndex[i] 
-             << ", capacity = " << capacity[i] << "\n";
-    }
-    cout << "\n";
-
-    int choice;
-    do {
-        cout << "\n-- MENU --\n";
-        cout << "1. Push\n";
-        cout << "2. Pop\n";
-        cout << "3. Latest/Top (peek)\n";
-        cout << "4. isEmpty\n";
-        cout << "5. isFull (stack overflow check)\n";
-        cout << "6. Display all stacks\n";
-        cout << "7. Exit\n";
+    do
+    {
+        cout << "\n1.Push\n2.Pop\n3.Display\n4.Exit\n";
         cout << "Enter choice: ";
-        cin >> choice;
+        cin >> ch;
 
-        if (choice == 1) {
-            int s, val;
-            cout << "Enter stack number (1.." << k << "): ";
+        if (ch == 1)
+        {
+            cout << "Enter stack number: ";
             cin >> s;
-            if (s < 1 || s > k) { cout << "Invalid stack number.\n"; continue; }
-            int si = s - 1;
 
-            // check overflow
-            if (topIndex[si] >= baseIndex[si] + capacity[si] - 1) {
-                cout << "Stack Overflow on stack " << s << ". Cannot push.\n";
-            } else {
-                cout << "Enter value to push: ";
-                cin >> val;
-                topIndex[si]++;
-                arr[topIndex[si]] = val;
-                cout << "Pushed " << val << " into stack " << s << "\n";
+            if (s < 1 || s > k)
+            {
+                cout << "Invalid stack number\n";
+                continue;
             }
-        }
-        else if (choice == 2) {
-            int s;
-            cout << "Enter stack number (1.." << k << "): ";
-            cin >> s;
-            if (s < 1 || s > k) { cout << "Invalid stack number.\n"; continue; }
-            int si = s - 1;
 
-            // check underflow
-            if (topIndex[si] < baseIndex[si]) {
-                cout << "Stack Underflow on stack " << s << ". Nothing to pop.\n";
-            } else {
-                int val = arr[topIndex[si]];
-                topIndex[si]--;
-                cout << "Popped " << val << " from stack " << s << ".\n";
+            cout << "Enter value: ";
+            cin >> x;
+            push(s - 1, x);
+        }
+        else if (ch == 2)
+        {
+            cout << "Enter stack number: ";
+            cin >> s;
+
+            if (s < 1 || s > k)
+            {
+                cout << "Invalid stack number\n";
+                continue;
             }
-        }
-        else if (choice == 3) {
-            int s;
-            cout << "Enter stack number (1.." << k << "): ";
-            cin >> s;
-            if (s < 1 || s > k) { cout << "Invalid stack number.\n"; continue; }
-            int si = s - 1;
 
-            if (topIndex[si] < baseIndex[si]) {
-                cout << "Stack " << s << " is empty.\n";
-            } else {
-                cout << "Top of stack " << s << " = " << arr[topIndex[si]] << "\n";
-            }
+            pop(s - 1);
         }
-        else if (choice == 4) {
-            int s;
-            cout << "Enter stack number (1.." << k << "): ";
-            cin >> s;
-            if (s < 1 || s > k) { cout << "Invalid stack number.\n"; continue; }
-            int si = s - 1;
-            
-            if (topIndex[si] < baseIndex[si]) cout << "Stack " << s << " is EMPTY.\n";
-            else cout << "Stack " << s << " is NOT empty.\n";
-        }
-        else if (choice == 5) {
-            int s;
-            cout << "Enter stack number (1.." << k << "): ";
-            cin >> s;
-            if (s < 1 || s > k) { cout << "Invalid stack number.\n"; continue; }
-            int si = s - 1;
-
-            if (topIndex[si] >= baseIndex[si] + capacity[si] - 1)
-                cout << "Stack " << s << " is FULL (Overflow condition).\n";
-            else
-                cout << "Stack " << s << " is NOT full.\n";
-        }
-        else if (choice == 6) {
-            cout << "\nStacks content (top shown first):\n";
-            for (int i = 0; i < k; ++i) {
-                cout << "Stack " << i + 1 << ": ";
-                if (topIndex[i] < baseIndex[i]) {
-                    cout << "(empty)\n";
-                    continue;
-                }
-                // print from top down to base
-                for (int p = topIndex[i]; p >= baseIndex[i]; --p) {
-                    cout << arr[p];
-                    if (p > baseIndex[i]) cout << " ";
-                }
-                cout << "\n";
-            }
-        }
-        else if (choice == 7) {
-            cout << "Exiting.\n";
-        }
-        else {
-            cout << "Invalid choice.\n";
+        else if (ch == 3)
+        {
+            display(k);
         }
 
-    } while (choice != 7);
+    } while (ch != 4);
 
-    delete[] arr;
-    delete[] baseIndex;
-    delete[] capacity;
-    delete[] topIndex;
-
-    return 0;
+    getch();
 }
 ```
 
