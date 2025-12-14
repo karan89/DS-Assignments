@@ -6,127 +6,81 @@ Write a program to perform Binary Search Tree (BST) operations (Count the total 
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+/*Write a program to perform Binary Search Tree (BST) operations (Count the total number of nodes, Compute the height of the BST, Mirror Image ). */
 
-typedef struct node {
-    int key;
-    struct node* left;
-    struct node* right;
-} BTNODE;
+#include <iostream.h>
+#include <conio.h>
 
-BTNODE* createNode(int k) {
-    BTNODE* n = new BTNODE;
-    n->key = k;
-    n->left = n->right = NULL;
-    return n;
-}
+struct node {
+    int data;
+    node *left, *right;
+};
 
-BTNODE* insertNode(BTNODE* root, int key) {
-    if (root == NULL) return createNode(key);
-    
-    if (key < root->key) root->left = insertNode(root->left, key);
-    else if (key > root->key) root->right = insertNode(root->right, key);
-    else cout << "Key " << key << " already exists. Ignored.\n";
-    
+node* insert(node* root, int x) {
+    if (!root) {
+        root = new node;
+        root->data = x;
+        root->left = root->right = NULL;
+        return root;
+    }
+    if (x < root->data)
+        root->left = insert(root->left, x);
+    else
+        root->right = insert(root->right, x);
     return root;
 }
 
-int countNodes(BTNODE* root) {
+int count(node* root) {
     if (!root) return 0;
-    return 1 + countNodes(root->left) + countNodes(root->right);
+    return 1 + count(root->left) + count(root->right);
 }
 
-int treeHeight(BTNODE* root) {
+int height(node* root) {
     if (!root) return 0;
-    int lh = treeHeight(root->left);
-    int rh = treeHeight(root->right);
-    return 1 + ((lh > rh) ? lh : rh);
+    int l = height(root->left);
+    int r = height(root->right);
+    return (l > r ? l : r) + 1;
 }
 
-BTNODE* mirrorTree(BTNODE* root) {
-    if (!root) return NULL;
-    
-    BTNODE* leftMir = mirrorTree(root->left);
-    BTNODE* rightMir = mirrorTree(root->right);
-    
-    root->left = rightMir;
-    root->right = leftMir;
-    
-    return root;
+void mirror(node* root) {
+    if (!root) return;
+    node* t = root->left;
+    root->left = root->right;
+    root->right = t;
+
+    mirror(root->left);
+    mirror(root->right);
 }
 
-void inorder(BTNODE* root) {
+void inorder(node* root) {
     if (!root) return;
     inorder(root->left);
-    cout << root->key << " ";
+    cout << root->data << " ";
     inorder(root->right);
 }
 
-void freeTree(BTNODE* root) {
-    if (!root) return;
-    freeTree(root->left);
-    freeTree(root->right);
-    delete root;
-}
+void main() {
+    clrscr();
+    node* root = NULL;
+    int n, i, x;
 
-int main() {
-    BTNODE* root = NULL;
-    int choice;
-    cout << "=== BST: Count nodes, Height, Mirror Image ===\n";
-    do {
-        cout << "\nMENU: \n";
-        cout << "1. Create tree (insert multiple keys)\n";
-        cout << "2. Insert key\n";
-        cout << "3. Count total nodes\n";
-        cout << "4. Compute height of BST\n";
-        cout << "5. Mirror image (convert tree to its mirror)\n";
-        cout << "6. Display\n";
-        cout << "7. Exit\n";
-        cout << "Enter choice: ";
-        cin >> choice;
+    cout << "Enter number of nodes: ";
+    cin >> n;
 
-        if (choice == 1) {
-            int n; cout << "How many keys to insert? "; cin >> n;
-            cout << "Enter keys (space separated): \n";
-            for (int i = 0; i < n; ++i) {
-                int k; cin >> k; 
-                root = insertNode(root, k);
-            }
-            cout << "Tree created/updated.\n";
-        }
-        else if (choice == 2) {
-            int k; cout << "Enter key to insert: "; cin >> k;
-            root = insertNode(root, k);
-        }
-        else if (choice == 3) {
-            int total = countNodes(root);
-            cout << "Total number of nodes = " << total << "\n";
-        }
-        else if (choice == 4) {
-            int h = treeHeight(root);
-            cout << "Height of BST = " << h << "\n";
-        }
-        else if (choice == 5) {
-            root = mirrorTree(root);
-            cout << "Tree mirrored (in-place).\n";
-        }
-        else if (choice == 6) {
-            cout << "Inorder: ";
-            if (!root) cout << "(empty)";
-            else inorder(root);
-            cout << "\n";
-        }
-        else if (choice == 7) {
-            cout << "Exiting. Freeing memory.\n";
-            freeTree(root);
-        }
-        else {
-            cout << "Invalid choice.\n";
-        }
-    } while (choice != 7);
-    
-    return 0;
+    for (i = 0; i < n; i++) {
+        cout << "Enter data: ";
+        cin >> x;
+        root = insert(root, x);
+    }
+
+    cout << "\nTotal Nodes: " << count(root);
+    cout << "\nHeight of BST: " << height(root);
+
+    mirror(root);
+    cout << "\nInorder after Mirror: ";
+    inorder(root);
+
+    getch();
 }
 ```
 
