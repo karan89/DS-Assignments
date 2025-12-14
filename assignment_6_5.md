@@ -9,96 +9,98 @@ If there are no calls, the system waits.
 ## Code
 
 ```cpp
-#include <iostream>
-#include <string>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
+#include <string.h>
 
-struct Node {
-    string callName;
-    Node* next;
+struct Node
+{
+    char name[20];
+    Node *next;
 };
 
-Node* frontPtr = NULL;
-Node* rearPtr = NULL;
+Node *front = NULL;
+Node *rear = NULL;
 
-// Add a customer call
-void enqueue(string name) {
-    Node* n = new Node;
-    n->callName = name;
-    n->next = NULL;
-    
-    if (rearPtr == NULL) {
-        frontPtr = rearPtr = n;
-    } else {
-        rearPtr->next = n;
-        rearPtr = n;
+/* Enqueue */
+void enqueue(char name[])
+{
+    Node *temp = new Node;
+    strcpy(temp->name, name);
+    temp->next = NULL;
+
+    if (front == NULL)
+        front = rear = temp;
+    else
+    {
+        rear->next = temp;
+        rear = temp;
     }
-    cout << "Call from " << name << " added to the queue.\n";
 }
 
-// Remove a customer call
-void dequeue() {
-    if (frontPtr == NULL) {
-        cout << "No calls in the queue.\n";
+/* Dequeue */
+void dequeue()
+{
+    if (front == NULL)
+    {
+        cout << "Queue Empty\n";
         return;
     }
-    Node* temp = frontPtr;
-    cout << "Serving call of: " << frontPtr->callName << endl;
-    frontPtr = frontPtr->next;
-    
-    if (frontPtr == NULL)
-        rearPtr = NULL;
-        
+
+    Node *temp = front;
+    cout << "Serving: " << front->name << endl;
+    front = front->next;
+
+    if (front == NULL)
+        rear = NULL;
+
     delete temp;
 }
 
-// Display all calls waiting in queue
-void display() {
-    if (frontPtr == NULL) {
-        cout << "No calls in the queue.\n";
+/* Display */
+void display()
+{
+    Node *temp = front;
+    if (temp == NULL)
+    {
+        cout << "Queue Empty\n";
         return;
     }
-    cout << "Calls waiting in queue:\n";
-    Node* temp = frontPtr;
-    while (temp != NULL) {
-        cout << "- " << temp->callName << endl;
+
+    while (temp != NULL)
+    {
+        cout << temp->name << " ";
         temp = temp->next;
     }
+    cout << endl;
 }
 
-int main() {
-    int choice;
-    string name;
-    
-    do {
-        cout << "\n--- Call Center Queue Menu ---\n";
-        cout << "1. Add Customer Call (Enqueue)\n";
-        cout << "2. Serve Next Call (Dequeue)\n";
-        cout << "3. Display All Calls\n";
-        cout << "4. Exit\n";
-        cout << "Enter your choice: ";
-        cin >> choice;
-        
-        switch (choice) {
-            case 1:
-                cout << "Enter customer name: ";
-                cin >> name;
-                enqueue(name);
-                break;
-            case 2:
-                dequeue();
-                break;
-            case 3:
-                display();
-                break;
-            case 4:
-                cout << "Exiting...\n";
-                break;
-            default:
-                cout << "Invalid choice.\n";
+/* -------- MAIN -------- */
+int main()
+{
+    int ch;
+    char name[20];
+    clrscr();
+
+    do
+    {
+        cout << "\n1.Enqueue\n2.Dequeue\n3.Display\n4.Exit\n";
+        cout << "Choice: ";
+        cin >> ch;
+
+        if (ch == 1)
+        {
+            cout << "Enter name: ";
+            cin >> name;
+            enqueue(name);
         }
-    } while (choice != 4);
-    
+        else if (ch == 2)
+            dequeue();
+        else if (ch == 3)
+            display();
+
+    } while (ch != 4);
+
     return 0;
 }
 ```
