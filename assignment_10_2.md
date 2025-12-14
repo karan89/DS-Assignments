@@ -6,60 +6,63 @@ Write a Program to implement Dijkstra's algorithm to find shortest distance betw
 ## Code
 
 ```cpp
-#include <iostream>
-#include <climits>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
 
 #define MAX 10
+#define INF 9999
 
-// Linked List Node to store path
-struct Node {
+/* Linked List Node for Path */
+struct Node
+{
     int data;
-    Node* next;
+    Node *next;
 };
 
-// Function to add node at end of linked list
-void insert(Node* &head, int value) {
-    Node* newNode = new Node();
-    newNode->data = value;
-    newNode->next = NULL;
-
-    if(head == NULL) {
-        head = newNode;
-    } else {
-        Node* temp = head;
-        while(temp->next != NULL)
-            temp = temp->next;
-        temp->next = newNode;
-    }
+/* Insert at beginning (simple) */
+void insert(Node* &head, int value)
+{
+    Node *t = new Node;
+    t->data = value;
+    t->next = head;
+    head = t;
 }
 
-// Function to print linked list
-void display(Node* head) {
-    while(head != NULL) {
+/* Display linked list */
+void display(Node *head)
+{
+    while (head != NULL)
+    {
         cout << head->data << " ";
         head = head->next;
     }
-    cout << endl;
 }
 
-// Dijkstra Algorithm
-void dijkstra(int graph[MAX][MAX], int n, int src, int dest) {
+/* Dijkstra Algorithm */
+void dijkstra(int graph[MAX][MAX], int n, int src, int dest)
+{
     int dist[MAX], visited[MAX], parent[MAX];
+    int i, j, count, u, min;
+    Node *path = NULL;
+    int temp;
 
-    for(int i = 0; i < n; i++) {
-        dist[i] = INT_MAX;
+    for (i = 0; i < n; i++)
+    {
+        dist[i] = INF;
         visited[i] = 0;
         parent[i] = -1;
     }
 
     dist[src] = 0;
 
-    for(int count = 0; count < n - 1; count++) {
-        int min = INT_MAX, u;
+    for (count = 0; count < n - 1; count++)
+    {
+        min = INF;
 
-        for(int i = 0; i < n; i++) {
-            if(!visited[i] && dist[i] <= min) {
+        for (i = 0; i < n; i++)
+        {
+            if (visited[i] == 0 && dist[i] < min)
+            {
                 min = dist[i];
                 u = i;
             }
@@ -67,58 +70,57 @@ void dijkstra(int graph[MAX][MAX], int n, int src, int dest) {
 
         visited[u] = 1;
 
-        for(int v = 0; v < n; v++) {
-            if(!visited[v] && graph[u][v] && dist[u] != INT_MAX && 
-               dist[u] + graph[u][v] < dist[v]) {
-                dist[v] = dist[u] + graph[u][v];
-                parent[v] = u;
+        for (j = 0; j < n; j++)
+        {
+            if (visited[j] == 0 && graph[u][j] != 0 &&
+                dist[u] + graph[u][j] < dist[j])
+            {
+                dist[j] = dist[u] + graph[u][j];
+                parent[j] = u;
             }
         }
     }
 
-    cout << "\nShortest Distance from " << src << " to " << dest << " = " << dist[dest] << endl;
+    /* Build path using linked list */
+    temp = dest;
 
-    // Store path in linked list
-    Node* path = NULL;
-    int temp = dest;
-    
-    // Check if path exists
-    if (dist[dest] == INT_MAX) {
-        cout << "No path exists.\n";
-        return;
-    }
-
-    while(temp != -1) {
+    while (temp != -1)
+    {
         insert(path, temp);
         temp = parent[temp];
     }
 
-    cout << "Path (in reverse using linked list): ";
+    cout << "\nShortest Distance = " << dist[dest] << endl;
+    cout << "Path: ";
     display(path);
 }
 
-int main() {
-    int graph[MAX][MAX], n, src, dest;
+/* MAIN */
+void main()
+{
+    int graph[MAX][MAX];
+    int n, i, j, src, dest;
+    clrscr();
 
     cout << "Enter number of vertices: ";
     cin >> n;
 
-    cout << "Enter Adjacency Matrix: \n";
-    for(int i = 0; i < n; i++) {
-        for(int j = 0; j < n; j++) {
+    cout << "Enter adjacency matrix:\n";
+    for (i = 0; i < n; i++)
+        for (j = 0; j < n; j++)
             cin >> graph[i][j];
-        }
-    }
 
-    cout << "Enter source node: ";
+    cout << "Enter source vertex: ";
     cin >> src;
-    cout << "Enter destination node: ";
+
+    cout << "Enter destination vertex: ";
     cin >> dest;
 
     dijkstra(graph, n, src, dest);
 
-    return 0;
+    getch();
 }
+
 ```
 
 ## Output
