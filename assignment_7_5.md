@@ -6,161 +6,80 @@ Write a Program to create a Binary Tree and perform the following Recursive oper
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+/*Write a Program to create a Binary Tree and perform the following Recursive operations on it. a. Inorder Traversal b. Preorder Traversal c. Display Number of Leaf Nodes d. Mirror Image */
 
-typedef struct node {
+#include <iostream.h>
+#include <conio.h>
+
+struct node {
     int data;
-    struct node* left;
-    struct node* right;
-} BTNODE;
+    node *left, *right;
+};
 
-BTNODE* createNode(int val) {
-    BTNODE* p = new BTNODE;
-    p->data = val;
-    p->left = p->right = NULL;
-    return p;
+node* create(int x) {
+    node* t = new node;
+    t->data = x;
+    t->left = t->right = NULL;
+    return t;
 }
 
-BTNODE* buildTreeFromArray(int arr[], int n) {
-    if (n == 0) return NULL;
-    
-    BTNODE** nodes = new BTNODE*[n];
-    for (int i = 0; i < n; ++i) nodes[i] = createNode(arr[i]);
-    
-    for (int i = 0; i < n; ++i) {
-        int li = 2 * i + 1;
-        int ri = 2 * i + 2;
-        if (li < n) nodes[i]->left = nodes[li];
-        if (ri < n) nodes[i]->right = nodes[ri];
-    }
-    
-    BTNODE* root = nodes[0];
-    delete[] nodes;
-    return root;
-}
-
-void inorderRecursive(BTNODE* root) {
+void inorder(node* root) {
     if (!root) return;
-    inorderRecursive(root->left);
+    inorder(root->left);
     cout << root->data << " ";
-    inorderRecursive(root->right);
+    inorder(root->right);
 }
 
-void preorderRecursive(BTNODE* root) {
+void preorder(node* root) {
     if (!root) return;
     cout << root->data << " ";
-    preorderRecursive(root->left);
-    preorderRecursive(root->right);
+    preorder(root->left);
+    preorder(root->right);
 }
 
-int countLeafNodesRecursive(BTNODE* root) {
+int leafCount(node* root) {
     if (!root) return 0;
-    if (!root->left && !root->right) return 1; // it's a leaf
-    return countLeafNodesRecursive(root->left) + countLeafNodesRecursive(root->right);
+    if (!root->left && !root->right) return 1;
+    return leafCount(root->left) + leafCount(root->right);
 }
 
-void mirrorRecursive(BTNODE* root) {
+void mirror(node* root) {
     if (!root) return;
-    BTNODE* tmp = root->left;
+    node* t = root->left;
     root->left = root->right;
-    root->right = tmp;
-    
-    mirrorRecursive(root->left);
-    mirrorRecursive(root->right);
+    root->right = t;
+    mirror(root->left);
+    mirror(root->right);
 }
 
-void levelOrderDisplay(BTNODE* root) {
-    if (!root) { cout << "(empty)\n"; return; }
-    
-    // Simple queue using array for display
-    const int MAXQ = 1000;
-    BTNODE* q[MAXQ];
-    int front = 0, rear = 0;
-    
-    q[rear++] = root;
-    cout << "Level-order: ";
-    
-    while (front < rear) {
-        BTNODE* cur = q[front++];
-        cout << cur->data << " ";
-        if (cur->left) q[rear++] = cur->left;
-        if (cur->right) q[rear++] = cur->right;
-    }
-    cout << "\n";
-}
+void main() {
+    clrscr();
+    int x;
+    cout << "Enter root value: ";
+    cin >> x;
+    node* root = create(x);
 
-void freeTree(BTNODE* root) {
-    if (!root) return;
-    freeTree(root->left);
-    freeTree(root->right);
-    delete root;
-}
+    cout << "Enter left child: ";
+    cin >> x;
+    root->left = create(x);
 
-int main() {
-    BTNODE* root = NULL;
-    int choice;
-    cout << "=== Binary Tree: Recursive Operations ===\n";
-    
-    do {
-        cout << "\nMENU:\n";
-        cout << "1. Create tree from array (level-order)\n";
-        cout << "2. Inorder traversal (recursive)\n";
-        cout << "3. Preorder traversal (recursive)\n";
-        cout << "4. Display number of leaf nodes (recursive)\n";
-        cout << "5. Mirror image (recursive, in-place)\n";
-        cout << "6. Level-order display (verification)\n";
-        cout << "7. Exit\n";
-        cout << "Enter choice: ";
-        cin >> choice;
+    cout << "Enter right child: ";
+    cin >> x;
+    root->right = create(x);
 
-        if (choice == 1) {
-            if (root) { freeTree(root); root = NULL; }
-            int n; cout << "Enter number of nodes (n): ";
-            cin >> n;
-            if (n <= 0) { cout << "Empty tree created.\n"; continue; }
-            
-            int* arr = new int[n];
-            cout << "Enter " << n << " integer values (level-order):\n";
-            for (int i = 0; i < n; ++i) cin >> arr[i];
-            
-            root = buildTreeFromArray(arr, n);
-            delete[] arr;
-            cout << "Tree created (complete tree of " << n << " nodes).\n";
-        }
-        else if (choice == 2) {
-            cout << "Inorder (recursive): ";
-            if (!root) cout << "(empty)";
-            else inorderRecursive(root);
-            cout << "\n";
-        }
-        else if (choice == 3) {
-            cout << "Preorder (recursive): ";
-            if (!root) cout << "(empty)";
-            else preorderRecursive(root);
-            cout << "\n";
-        }
-        else if (choice == 4) {
-            int cnt = countLeafNodesRecursive(root);
-            cout << "Number of leaf nodes = " << cnt << "\n";
-        }
-        else if (choice == 5) {
-            mirrorRecursive(root);
-            cout << "Tree mirrored (in-place) recursively.\n";
-        }
-        else if (choice == 6) {
-            levelOrderDisplay(root);
-        }
-        else if (choice == 7) {
-            cout << "Exiting. Freeing tree memory.\n";
-            freeTree(root);
-        }
-        else {
-            cout << "Invalid choice.\n";
-        }
-    } while (choice != 7);
-    
-    return 0;
+    cout << "\nInorder: ";
+    inorder(root);
+
+    cout << "\nPreorder: ";
+    preorder(root);
+
+    cout << "\nLeaf Nodes: " << leafCount(root);
+
+    mirror(root);
+    cout << "\nMirror Inorder: ";
+    inorder(root);
+
+    getch();
 }
 ```
 
