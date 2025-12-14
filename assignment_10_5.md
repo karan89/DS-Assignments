@@ -6,54 +6,58 @@ Write a Program to implement Dijkstra's algorithm to find shortest distance betw
 ## Code
 
 ```cpp
-#include <iostream>
-#include <climits>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
 
-// Node for adjacency list
-struct Node {
+#define MAX 10
+#define INF 9999
+
+/* Node for Adjacency List */
+struct Node
+{
     int vertex;
     int weight;
-    Node* next;
+    Node *next;
 };
 
-// Create new node
-Node* createNode(int v, int w) {
-    Node* newNode = new Node();
-    newNode->vertex = v;
-    newNode->weight = w;
-    newNode->next = NULL;
-    return newNode;
+/* Add edge (Undirected Graph) */
+void addEdge(Node *adj[], int u, int v, int w)
+{
+    Node *t = new Node;
+    t->vertex = v;
+    t->weight = w;
+    t->next = adj[u];
+    adj[u] = t;
+
+    t = new Node;
+    t->vertex = u;
+    t->weight = w;
+    t->next = adj[v];
+    adj[v] = t;
 }
 
-// Add edge (undirected)
-void addEdge(Node* adj[], int u, int v, int w) {
-    Node* newNode = createNode(v, w);
-    newNode->next = adj[u];
-    adj[u] = newNode;
+/* Dijkstra Algorithm */
+void dijkstra(Node *adj[], int n, int src, int dest)
+{
+    int dist[MAX], visited[MAX];
+    int i, count, u, min;
 
-    newNode = createNode(u, w);
-    newNode->next = adj[v];
-    adj[v] = newNode;
-}
-
-// Dijkstra Algorithm
-void dijkstra(Node* adj[], int n, int src) {
-    int dist[10], visited[10];
-
-    for(int i = 0; i < n; i++) {
-        dist[i] = INT_MAX;
+    for (i = 0; i < n; i++)
+    {
+        dist[i] = INF;
         visited[i] = 0;
     }
 
     dist[src] = 0;
 
-    for(int count = 0; count < n - 1; count++) {
-        int min = INT_MAX, u;
+    for (count = 0; count < n - 1; count++)
+    {
+        min = INF;
 
-        // Find minimum distance vertex
-        for(int i = 0; i < n; i++) {
-            if(!visited[i] && dist[i] < min) {
+        for (i = 0; i < n; i++)
+        {
+            if (visited[i] == 0 && dist[i] < min)
+            {
                 min = dist[i];
                 u = i;
             }
@@ -61,43 +65,44 @@ void dijkstra(Node* adj[], int n, int src) {
 
         visited[u] = 1;
 
-        Node* temp = adj[u];
-        while(temp != NULL) {
-            int v = temp->vertex;
-            int w = temp->weight;
+        Node *p = adj[u];
+        while (p != NULL)
+        {
+            int v = p->vertex;
+            int w = p->weight;
 
-            if(!visited[v] && dist[u] != INT_MAX && dist[u] + w < dist[v]) {
+            if (visited[v] == 0 && dist[u] + w < dist[v])
+            {
                 dist[v] = dist[u] + w;
             }
-            temp = temp->next;
+            p = p->next;
         }
     }
 
-    cout << "\nShortest distances from source " << src << ":\n";
-    for(int i = 0; i < n; i++) {
-        if (dist[i] == INT_MAX)
-            cout << "To " << i << " = INF" << endl;
-        else
-            cout << "To " << i << " = " << dist[i] << endl;
-    }
+    cout << "\nShortest distance from "
+         << src << " to " << dest
+         << " = " << dist[dest] << endl;
 }
 
-int main() {
-    Node* adj[10];
-    int n, e, u, v, w, src;
+/* MAIN */
+void main()
+{
+    int n, e, u, v, w, src, dest, i;
+    Node *adj[MAX];
+    clrscr();
 
     cout << "Enter number of vertices: ";
     cin >> n;
 
-    for(int i = 0; i < n; i++) {
+    for (i = 0; i < n; i++)
         adj[i] = NULL;
-    }
 
     cout << "Enter number of edges: ";
     cin >> e;
 
-    cout << "Enter edges (u v weight): \n";
-    for(int i = 0; i < e; i++) {
+    cout << "Enter edges (u v weight):\n";
+    for (i = 0; i < e; i++)
+    {
         cin >> u >> v >> w;
         addEdge(adj, u, v, w);
     }
@@ -105,10 +110,14 @@ int main() {
     cout << "Enter source vertex: ";
     cin >> src;
 
-    dijkstra(adj, n, src);
+    cout << "Enter destination vertex: ";
+    cin >> dest;
 
-    return 0;
+    dijkstra(adj, n, src, dest);
+
+    getch();
 }
+
 ```
 
 ## Output
