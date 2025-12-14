@@ -6,119 +6,143 @@ Write a Program to implement Kruskal's algorithm to find the minimum spanning tr
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
 
-struct Node {
-    int dest, weight;
-    Node* next;
+#define MAXV 20
+#define MAXE 50
+
+/* Adjacency List Node */
+struct Node
+{
+    int v;
+    int w;
+    Node *next;
 };
 
-struct Edge {
-    int src, dest, weight;
+/* Edge structure for Kruskal */
+struct Edge
+{
+    int src;
+    int dest;
+    int weight;
 };
 
-class Graph {
-    int V;
-    Node* adjList[20];
-    Edge edges[50];
-    int edgeCount = 0;
-    int parent[20];
+Node *adj[MAXV];
+Edge edges[MAXE];
+int parent[MAXV];
 
-public:
-    Graph(int v) {
-        V = v;
-        for (int i = 0; i < V; i++) {
-            adjList[i] = NULL;
-        }
-    }
+int V, E, edgeCount = 0;
 
-    void addEdge(int src, int dest, int weight) {
-        // Add to Adjacency List
-        Node* newNode = new Node();
-        newNode->dest = dest;
-        newNode->weight = weight;
-        newNode->next = adjList[src];
-        adjList[src] = newNode;
+/* Create adjacency list edge */
+void addEdge(int u, int v, int w)
+{
+    Node *t = new Node;
+    t->v = v;
+    t->w = w;
+    t->next = adj[u];
+    adj[u] = t;
 
-        newNode = new Node();
-        newNode->dest = src;
-        newNode->weight = weight;
-        newNode->next = adjList[dest];
-        adjList[dest] = newNode;
+    t = new Node;
+    t->v = u;
+    t->w = w;
+    t->next = adj[v];
+    adj[v] = t;
 
-        // Add to Edge array for Kruskal's
-        edges[edgeCount++] = {src, dest, weight};
-    }
+    /* Store edge only once */
+    edges[edgeCount].src = u;
+    edges[edgeCount].dest = v;
+    edges[edgeCount].weight = w;
+    edgeCount++;
+}
 
-    int find(int i) {
-        while (parent[i] != i) {
-            i = parent[i];
-        }
-        return i;
-    }
+/* Find set */
+int findSet(int i)
+{
+    while (parent[i] != i)
+        i = parent[i];
+    return i;
+}
 
-    void unionSet(int a, int b) {
-        int rootA = find(a);
-        int rootB = find(b);
-        parent[rootA] = rootB;
-    }
+/* Union sets */
+void unionSet(int a, int b)
+{
+    int x = findSet(a);
+    int y = findSet(b);
+    parent[x] = y;
+}
 
-    void kruskalMST() {
-        // Initialize parent for Union-Find
-        for (int i = 0; i < V; i++) {
-            parent[i] = i;
-        }
+/* Kruskal Algorithm */
+void kruskal()
+{
+    int i, j;
+    Edge temp;
+    int totalCost = 0;
 
-        // Simple bubble sort for edges by weight
-        for (int i = 0; i < edgeCount - 1; i++) {
-            for (int j = 0; j < edgeCount - i - 1; j++) {
-                if (edges[j].weight > edges[j + 1].weight) {
-                    Edge temp = edges[j];
-                    edges[j] = edges[j + 1];
-                    edges[j + 1] = temp;
-                }
+    /* Initialize parent */
+    for (i = 0; i < V; i++)
+        parent[i] = i;
+
+    /* Sort edges by weight (Bubble Sort) */
+    for (i = 0; i < edgeCount - 1; i++)
+    {
+        for (j = 0; j < edgeCount - i - 1; j++)
+        {
+            if (edges[j].weight > edges[j + 1].weight)
+            {
+                temp = edges[j];
+                edges[j] = edges[j + 1];
+                edges[j + 1] = temp;
             }
         }
-
-        int totalCost = 0;
-        cout << "\nEdges in Minimum Spanning Tree: \n";
-
-        for (int i = 0; i < edgeCount; i++) {
-            int u = edges[i].src;
-            int v = edges[i].dest;
-
-            if (find(u) != find(v)) {
-                cout << u << " - " << v << " : " << edges[i].weight << endl;
-                totalCost += edges[i].weight;
-                unionSet(u, v);
-            }
-        }
-        cout << "Total Minimum Cost = " << totalCost << endl;
     }
-};
 
-int main() {
-    int v, e, src, dest, weight;
+    cout << "\nEdges in Minimum Spanning Tree:\n";
+
+    for (i = 0; i < edgeCount; i++)
+    {
+        int u = edges[i].src;
+        int v = edges[i].dest;
+
+        if (findSet(u) != findSet(v))
+        {
+            cout << u << " - " << v
+                 << "   Weight: " << edges[i].weight << endl;
+            totalCost += edges[i].weight;
+            unionSet(u, v);
+        }
+    }
+
+    cout << "Total Minimum Cost = " << totalCost << endl;
+}
+
+/* MAIN */
+void main()
+{
+    int i, u, v, w;
+    clrscr();
 
     cout << "Enter number of vertices: ";
-    cin >> v;
+    cin >> V;
 
-    Graph g(v);
+    for (i = 0; i < V; i++)
+        adj[i] = NULL;
 
     cout << "Enter number of edges: ";
-    cin >> e;
+    cin >> E;
 
-    for (int i = 0; i < e; i++) {
-        cout << "Enter edge (source destination weight): ";
-        cin >> src >> dest >> weight;
-        g.addEdge(src, dest, weight);
+    for (i = 0; i < E; i++)
+    {
+        cout << "Enter edge (u v weight): ";
+        cin >> u >> v >> w;
+        addEdge(u, v, w);
     }
 
-    g.kruskalMST();
+    kruskal();
 
-    return 0;
+    getch();
 }
+
 ```
 
 ## Output
