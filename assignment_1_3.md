@@ -6,73 +6,75 @@ Implement matrix multiplication and analyze its performance using row-major vs c
 ## Code
 
 ```cpp
-#include<iostream>
-using namespace std;
+#include<iostream.h>
+#include<conio.h>
 
-void row_major(int a[50][50], int b[50][50], int c[50][50], int n) {
-    for(int i=0; i<n; i++) {
-        for(int j=0; j<n; j++) {
+void row_major(int a[50][50],int b[50][50],int c[50][50],int n) {
+    int i, j, k;
+    for(i=0;i<n;i++) {
+        for(j=0;j<n;j++) {
             int sum=0;
-            for(int k=0; k<n; k++) {
-                sum += a[i][k] * b[k][j];
+            for(k=0;k<n;k++) {
+                sum+=a[i][k]*b[k][j];
             }
-            c[i][j] = sum;
+            c[i][j]=sum;
         }
     }
 }
 
-void column_major(int a[50][50], int b[50][50], int c[50][50], int n) {
-    // Note: This logic follows the pattern from the assignment PDF 
-    // simulating column-wise access/operations
-    for(int i=0; i<n; i++) {
-        for(int j=0; j<n; j++) {
+void column_major(int a[50][50],int b[50][50],int c[50][50],int n) {
+    int i, j, k;
+    for(i=0;i<n;i++) {
+        for(j=0;j<n;j++) {
             int sum=0;
-            for(int k=0; k<n; k++) {
-                sum += a[k][i] * b[j][k];
+            for(k=0;k<n;k++) {
+                sum+=a[k][i]*b[j][k];
             }
-            c[i][j] = sum;
+            c[i][j]=sum;
         }
-    }
+    }   
 }
 
 int main() {
-    int n;
-    cout << "Enter number of elements of matrix: ";
-    cin >> n;
+    int n, i, j;
+    int a[50][50],b[50][50],c[50][50];
+    clrscr();
+
+    cout<<"Enter number of elements of matrix: ";
+    cin>>n;
     
-    int a[50][50], b[50][50], c[50][50];
-    
-    cout << "Enter elements of matrix 1: " << endl;
-    for(int i=0; i<n; i++) {
-        for(int j=0; j<n; j++) {
-            cout << "Enter element: ";
-            cin >> a[i][j];
+    cout<<"Enter elements of matrix 1: "<<endl;
+    for(i=0;i<n;i++) {
+        for(j=0;j<n;j++) {
+            cout<<"Enter element: ";
+            cin>>a[i][j];
+        }
+    }
+    cout<<"Enter elements of matrix 2: "<<endl;
+    for(i=0;i<n;i++) {
+        for(j=0;j<n;j++) {
+            cout<<"Enter element: ";
+            cin>>b[i][j];
         }
     }
     
-    cout << "Enter elements of matrix 2: " << endl;
-    for(int i=0; i<n; i++) {
-        for(int j=0; j<n; j++) {
-            cout << "Enter element: ";
-            cin >> b[i][j];
-        }
+    row_major(a,b,c,n);
+    column_major(a,b,c,n);
+    
+    cout<<"\nResult:"<<endl;
+    for(i=0;i<n;i++) {
+        for(j=0;j<n;j++) {
+            cout<<c[i][j]<<" ";
+	}
+	cout<<"\n";
     }
-    
-    row_major(a, b, c, n);
-    column_major(a, b, c, n);
-    
-    cout << "\nResult:" << endl;
-    for(int i=0; i<n; i++) {
-        for(int j=0; j<n; j++) {
-            cout << c[i][j] << " ";
-        }
-    }
-    
-    cout << "\n\nRow major is fast because memory is accessed in order" << endl;
-    cout << "Column major is slow because memory is accessed with jumps";
-    
+    cout<<"\n\nRow major is fast because memory is accessed in order"<<endl;
+    cout<<"Column major is slow because memory is accessed with jumps";
+
+    getch();
     return 0;
 }
+
 ```
 
 ## Output
