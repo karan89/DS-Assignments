@@ -6,29 +6,24 @@ WAP to perform addition of two polynomials using singly linked list.
 ## Code
 
 ```cpp
-#include<iostream>
-#include<cmath>
-using namespace std;
+#include<iostream.h>
+#include<conio.h>
+#include<stdlib.h> // for abs()
 
 struct Node {
     int coef, exp;
     Node* next;
-    
-    Node(int c, int e, Node* n = NULL) {
-        coef = c;
-        exp = e;
-        next = n;
-    }
 };
 
 Node* insert(Node* h, int c, int e) {
-    if (h == NULL) return new Node(c, e, NULL);
+    if (c == 0) return h;
     
-    Node* t = new Node(c, e, NULL);
+    Node* t = new Node;
+    t->coef = c;
+    t->exp = e;
+    t->next = NULL;
     
-    // Insert at beginning if exp is smaller (assuming sorted by exp ascending)
-    // OR inserting based on the logic provided in PDF (descending order typically)
-    if (h->exp < e) {
+    if (!h || h->exp < e) {
         t->next = h;
         return t;
     }
@@ -55,25 +50,33 @@ void display(Node* h) {
         return;
     }
     
-    bool first = true;
+    int first = 1; // bool replacement
     while (h) {
         if (h->coef != 0) {
-            if (!first && h->coef > 0) cout << "+";
+            if (!first && h->coef > 0) cout << " + ";
+            if (h->coef < 0) cout << " - ";
             
             int absCoef = abs(h->coef);
-            if (!first && h->coef < 0) cout << "-";
-            else if (first && h->coef < 0) cout << "-";
             
             if (h->exp == 0) {
-                cout << absCoef;
+                if (!first) cout << absCoef;
+                else cout << h->coef;
             } else if (h->exp == 1) {
-                if (absCoef != 1) cout << absCoef << "x";
-                else cout << "x";
+                if (absCoef != 1) {
+                    if (!first) cout << absCoef << "x";
+                    else cout << h->coef << "x";
+                } else {
+                    cout << "x";
+                }
             } else {
-                if (absCoef != 1) cout << absCoef << "x^" << h->exp;
-                else cout << "x^" << h->exp;
+                if (absCoef != 1) {
+                    if (!first) cout << absCoef << "x^" << h->exp;
+                    else cout << h->coef << "x^" << h->exp;
+                } else {
+                    cout << "x^" << h->exp;
+                }
             }
-            first = false;
+            first = 0;
         }
         h = h->next;
     }
@@ -103,10 +106,12 @@ Node* add(Node* a, Node* b) {
         r = insert(r, a->coef, a->exp);
         a = a->next;
     }
+    
     while (b) {
         r = insert(r, b->coef, b->exp);
         b = b->next;
     }
+    
     return r;
 }
 
@@ -121,8 +126,9 @@ void destroy(Node* h) {
 int main() {
     Node *p1 = NULL, *p2 = NULL, *sum = NULL;
     int ch, c, e;
+    clrscr();
     
-    cout << " POLYNOMIAL ADDITION USING SLL (C++) \n";
+    cout << "   POLYNOMIAL ADDITION USING SLL (C++) \n";
     
     do {
         cout << "\n[1] Insert in P1\n[2] Insert in P2\n[3] Add Polynomials\n";
@@ -135,26 +141,36 @@ int main() {
                 cin >> c >> e;
                 p1 = insert(p1, c, e);
                 break;
+                
             case 2:
                 cout << "Coeff Exp: ";
                 cin >> c >> e;
                 p2 = insert(p2, c, e);
                 break;
+                
             case 3:
                 if (sum) destroy(sum);
                 sum = add(p1, p2);
-                cout << "Polynomials added successfully \n";
+                cout << "Polynomials added successfully!\n";
                 break;
+                
             case 4:
-                cout << "\nP1 : "; display(p1);
-                cout << "\nP2 : "; display(p2);
-                cout << "\nSum: "; display(sum);
+                cout << "\nP1  : ";
+                display(p1);
+                cout << "\nP2  : ";
+                display(p2);
+                cout << "\nSum : ";
+                display(sum);
                 cout << "\n";
                 break;
+                
             case 5:
-                destroy(p1); destroy(p2); destroy(sum);
+                destroy(p1);
+                destroy(p2);
+                destroy(sum);
                 cout << "\nExiting...\n";
                 break;
+                
             default:
                 cout << "\nInvalid choice!\n";
         }
@@ -162,6 +178,7 @@ int main() {
     
     return 0;
 }
+
 ```
 
 ## Output
