@@ -6,105 +6,116 @@ In Computer Engg. Dept. of VIT there are S.Y., T.Y., and B.Tech. students. Assum
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+#include<iostream.h>
+#include<conio.h>
+#include<string.h>
+#include<stdlib.h>
 
-struct Student {
-    string name;
+struct Student
+{
+    char name[20];
     int roll;
-    string division;
-    string year;
+    char year[5];
+    char div[5];
 };
 
-int linear_search(Student students[], int n, string name, int roll, string year, string division) {
-    for(int i=0; i<n; i++) {
-        if (students[i].name==name && students[i].roll==roll &&
-            students[i].year==year && students[i].division==division) {
+/* Linear Search */
+int linearSearch(Student s[], int n, int roll)
+{
+    int i;
+    for(i = 0; i < n; i++)
+    {
+        if(s[i].roll == roll)
             return i;
-        }
     }
     return -1;
 }
 
-int binary_search(Student students[], int n, string name, int roll, string year, string division) {
-    int low = 0, high = n-1;
-    while(low <= high) {
-        int mid = (low + high) / 2;
-        if (students[mid].roll == roll && students[mid].name == name &&
-            students[mid].year == year && students[mid].division == division) {
+/* Binary Search (array must be sorted by roll no) */
+int binarySearch(Student s[], int n, int roll)
+{
+    int low = 0, high = n - 1, mid;
+
+    while(low <= high)
+    {
+        mid = (low + high) / 2;
+
+        if(s[mid].roll == roll)
             return mid;
-        }
-        else if (students[mid].roll < roll) {
+        else if(s[mid].roll < roll)
             low = mid + 1;
-        }
-        else {
+        else
             high = mid - 1;
-        }
     }
     return -1;
 }
 
-int main() {
-    Student students[] = {
-        {"ABC", 12, "X", "SY"},
-        {"XYZ", 17, "X", "SY"},
-        {"PQR", 22, "Y", "SY"},
-        {"LMN", 31, "Z", "TY"},
-        {"DEF", 45, "A", "BTech"}
-    };
-    
-    int n = sizeof(students)/sizeof(students[0]);
-    string targetName, targetYear, targetDiv;
-    int targetRoll;
-    
-    cout << "Enter student details to search:\n";
-    cout << "Name: ";
-    cin >> targetName;
-    cout << "Roll No: ";
-    cin >> targetRoll;
-    cout << "Year: ";
-    cin >> targetYear;
-    cout << "Division: ";
-    cin >> targetDiv;
-    
-    int x, y, ch;
-    do {
-        cout << "\n1. Linear Search\n2. Binary Search\n3. Exit\n";
-        cout << "Enter the choice: ";
+void main()
+{
+    Student s[20];
+    int n, i, ch, pos, roll;
+
+    clrscr();
+
+    cout << "Enter number of students: ";
+    cin >> n;
+
+    for(i = 0; i < n; i++)
+    {
+        cout << "\nEnter details of student " << i+1 << endl;
+        cout << "Name: ";
+        cin >> s[i].name;
+        cout << "Roll No: ";
+        cin >> s[i].roll;
+        cout << "Year: ";
+        cin >> s[i].year;
+        cout << "Division: ";
+        cin >> s[i].div;
+    }
+
+    cout << "\nEnter Roll Number to Search: ";
+    cin >> roll;
+
+    do
+    {
+        cout << "\n1. Linear Search";
+        cout << "\n2. Binary Search";
+        cout << "\n3. Exit";
+        cout << "\nEnter Choice: ";
         cin >> ch;
-        
-        switch(ch) {
+
+        switch(ch)
+        {
             case 1:
-                x = linear_search(students, n, targetName, targetRoll, targetYear, targetDiv);
-                if (x != -1)
-                    cout << "\nStudent Data Found using Linear Search: O(n)" << endl 
-                         << "Name: " << students[x].name << " Roll: " << students[x].roll 
-                         << " Year: " << students[x].year << " Division: " << students[x].division << endl;
-                else
-                    cout << "\nStudent Data not found using Linear Search.\n";
+                pos = linearSearch(s, n, roll);
                 break;
-                
+
             case 2:
-                y = binary_search(students, n, targetName, targetRoll, targetYear, targetDiv);
-                if (y != -1)
-                    cout << "\nStudent Data Found using Binary Search: O(log n)" << endl 
-                         << "Name: " << students[y].name << " Roll: " << students[y].roll 
-                         << " Year: " << students[y].year << " Division: " << students[y].division;
-                else
-                    cout << "\nStudent Data not found using Binary Search.\n";
+                pos = binarySearch(s, n, roll);
                 break;
-                
+
             case 3:
                 exit(0);
-                break;
-                
-            default:
-                cout << "Invalid Choice. Select choice from menu.\n";
         }
+
+        if(pos != -1)
+        {
+            cout << "\nStudent Found";
+            cout << "\nName: " << s[pos].name;
+            cout << "\nRoll: " << s[pos].roll;
+            cout << "\nYear: " << s[pos].year;
+            cout << "\nDivision: " << s[pos].div << endl;
+        }
+        else
+        {
+            cout << "\nStudent Not Found\n";
+        }
+
     } while(ch != 3);
-    
-    return 0;
+
+    getch();
 }
+
 ```
 
 ## Output
