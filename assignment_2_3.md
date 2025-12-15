@@ -6,31 +6,36 @@ Write a program to input marks of n students. Sort the marks in ascending order 
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+#include<iostream.h>
+#include<conio.h>
+
+void swapInt(int &a, int &b) {
+    int temp = a;
+    a = b;
+    b = temp;
+}
 
 // Partition function for Quick Sort
 int partition(int arr[], int low, int high) {
     int pivot = arr[low];
     int i = low;
     int j = high;
-    
-    while(i < j) {
-        while(arr[i] <= pivot && i <= high-1) {
+    while(i<j) {
+        while(arr[i]<=pivot && i<=high-1) {
             i++;
         }
-        while(arr[j] > pivot && j >= low+1) {
+        while(arr[j]>pivot && j>=low+1) {
             j--;
         }
-        if(i < j) swap(arr[i], arr[j]);
+        if(i<j) swapInt(arr[i], arr[j]);
     }
-    swap(arr[low], arr[j]);
+    swapInt(arr[low], arr[j]);
     return j;
 }
 
 // Quick Sort
 void quick_sort(int arr[], int low, int high) {
-    if(low < high) {
+    if(low<high) {
         int parIndex = partition(arr, low, high);
         quick_sort(arr, low, parIndex-1);
         quick_sort(arr, parIndex+1, high);
@@ -39,57 +44,65 @@ void quick_sort(int arr[], int low, int high) {
 
 // Function to find min and max using Divide and Conquer
 void minmax(int arr[], int low, int high, int &minVal, int &maxVal) {
-    if(low == high) {
-        if(arr[low] < minVal) minVal = arr[low];
-        if(arr[high] > maxVal) maxVal = arr[high];
+    int mid;
+    
+    if(low==high) {
+        if(arr[low]<minVal) minVal=arr[low];
+        if(arr[high]>maxVal) maxVal=arr[high];
         return;
     }
-    
-    if(high == low + 1) {
-        if(arr[low] < arr[high]) {
-            if(arr[low] < minVal) minVal = arr[low];
-            if(arr[high] > maxVal) maxVal = arr[high];
+
+    if(high==low+1) {
+        if(arr[low]<arr[high]) {
+            if(arr[low]<minVal) minVal=arr[low];
+            if(arr[high]>maxVal) maxVal=arr[high];
         }
         else {
-            if(arr[high] < minVal) minVal = arr[high];
-            if(arr[low] > maxVal) maxVal = arr[low]; // Correction: fixed arr[high] typo
+            if(arr[high]<minVal) minVal=arr[high];
+            if(arr[low]>maxVal) maxVal=arr[low];
         }
         return;
     }
-    
-    int mid = (low + high) / 2;
+
+    mid=(low+high)/2;
     minmax(arr, low, mid, minVal, maxVal);
     minmax(arr, mid+1, high, minVal, maxVal);
 }
 
 int main() {
-    int n;
-    cout << "Enter number of students: ";
-    cin >> n;
-    
-    int arr[n];
-    for (int i=0; i<n; i++) {
-        cout << "Enter marks: ";
-        cin >> arr[i];
+    int n, i;
+    int arr[50]; // Fixed size for Turbo C
+    int minVal, maxVal;
+
+    clrscr();
+
+    cout<<"Enter number of students: ";
+    cin>>n;
+
+    for (i = 0; i < n; i++) {
+        cout<<"Enter marks: ";
+        cin>>arr[i];
     }
-    
-    quick_sort(arr, 0, n-1);
-    
-    cout << "\nStudents sorted by Marks: \n";
-    for (int i=0; i<n; i++) {
-        cout << arr[i] << endl;
+
+    quick_sort(arr, 0, n - 1);
+
+    cout<<"\nStudents sorted by Marks: \n";
+    for (i = 0; i < n; i++) {
+        cout << arr[i]<<endl;
     }
-    
-    int minVal = arr[0];
-    int maxVal = arr[0];
-    
+
+    minVal = arr[0];
+    maxVal = arr[0];
+
     minmax(arr, 0, n-1, minVal, maxVal);
-    
-    cout << "\nMinimum marks: " << minVal << endl;
-    cout << "Maximum marks: " << maxVal << endl;
-    
+
+    cout<<"\nMinimum marks: "<<minVal<<endl;
+    cout<<"Maximum marks: "<<maxVal<<endl;
+
+    getch();
     return 0;
 }
+
 ```
 
 ## Output
