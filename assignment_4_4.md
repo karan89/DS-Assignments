@@ -7,24 +7,31 @@ A) Insert (all cases) 2. Delete (all cases).
 ## Code
 
 ```cpp
-#include<iostream>
-using namespace std;
+#include<iostream.h>
+#include<conio.h>
 
 struct Node {
     int data;
     Node* prev;
     Node* next;
-    
-    Node(int d) : data(d), prev(NULL), next(NULL) {}
 };
 
 Node* head = NULL;
 
+// Helper to allocate node
+Node* createNode(int d) {
+    Node* t = new Node;
+    t->data = d;
+    t->prev = NULL;
+    t->next = NULL;
+    return t;
+}
+
 void insertAtBegin(int v) {
-    Node* t = new Node(v);
+    Node* t = createNode(v);
     if (!head) {
         head = t;
-        cout << "Inserted at beginning \n";
+        cout << "Inserted at beginning!\n";
         return;
     }
     t->next = head;
@@ -34,7 +41,7 @@ void insertAtBegin(int v) {
 }
 
 void insertAtEnd(int v) {
-    Node* t = new Node(v);
+    Node* t = createNode(v);
     if (!head) {
         head = t;
         cout << "Inserted at end!\n";
@@ -42,26 +49,30 @@ void insertAtEnd(int v) {
     }
     Node* p = head;
     while (p->next) p = p->next;
-    
     p->next = t;
     t->prev = p;
     cout << "Inserted at end!\n";
 }
 
 void insertAtPosition(int v, int pos) {
+    int i;
     if (pos <= 0) {
         cout << "Invalid position!\n";
         return;
     }
+    
     if (pos == 1) {
         insertAtBegin(v);
         return;
     }
-    Node* t = new Node(v);
+    
+    Node* t = createNode(v);
     Node* p = head;
-    for (int i = 1; i < pos - 1 && p; i++) {
+    
+    for (i = 1; i < pos - 1 && p; i++) {
         p = p->next;
     }
+    
     if (!p) {
         cout << "Position out of range!\n";
         delete t;
@@ -70,8 +81,10 @@ void insertAtPosition(int v, int pos) {
     
     t->next = p->next;
     t->prev = p;
+    
     if (p->next) p->next->prev = t;
     p->next = t;
+    
     cout << "Inserted at position " << pos << "!\n";
 }
 
@@ -80,19 +93,24 @@ void insertAfterValue(int v, int val) {
         cout << "List is empty!\n";
         return;
     }
+    
     Node* p = head;
     while (p && p->data != val) {
         p = p->next;
     }
+    
     if (!p) {
         cout << "Value " << val << " not found!\n";
         return;
     }
-    Node* t = new Node(v);
+    
+    Node* t = createNode(v);
     t->next = p->next;
     t->prev = p;
+    
     if (p->next) p->next->prev = t;
     p->next = t;
+    
     cout << "Inserted after value " << val << "!\n";
 }
 
@@ -101,20 +119,26 @@ void insertBeforeValue(int v, int val) {
         cout << "List is empty!\n";
         return;
     }
+    
     Node* p = head;
     while (p && p->data != val) {
         p = p->next;
     }
+    
     if (!p) {
         cout << "Value " << val << " not found!\n";
         return;
     }
-    Node* t = new Node(v);
+    
+    Node* t = createNode(v);
     t->next = p;
     t->prev = p->prev;
+    
     if (p->prev) p->prev->next = t;
     else head = t;
+    
     p->prev = t;
+    
     cout << "Inserted before value " << val << "!\n";
 }
 
@@ -123,9 +147,12 @@ void deleteAtBegin() {
         cout << "List is empty!\n";
         return;
     }
+    
     Node* temp = head;
     head = head->next;
+    
     if (head) head->prev = NULL;
+    
     delete temp;
     cout << "Deleted from beginning!\n";
 }
@@ -135,12 +162,14 @@ void deleteAtEnd() {
         cout << "List is empty!\n";
         return;
     }
+    
     if (!head->next) {
         delete head;
         head = NULL;
         cout << "Deleted from end!\n";
         return;
     }
+    
     Node* p = head;
     while (p->next) p = p->next;
     
@@ -150,22 +179,27 @@ void deleteAtEnd() {
 }
 
 void deleteAtPosition(int pos) {
+    int i;
     if (!head) {
         cout << "List is empty!\n";
         return;
     }
+    
     if (pos <= 0) {
         cout << "Invalid position!\n";
         return;
     }
+    
     if (pos == 1) {
         deleteAtBegin();
         return;
     }
+    
     Node* p = head;
-    for (int i = 1; i < pos && p; i++) {
+    for (i = 1; i < pos && p; i++) {
         p = p->next;
     }
+    
     if (!p) {
         cout << "Position out of range!\n";
         return;
@@ -173,8 +207,9 @@ void deleteAtPosition(int pos) {
     
     if (p->prev) p->prev->next = p->next;
     if (p->next) p->next->prev = p->prev;
+    
     delete p;
-    cout << "Deleted from position " << pos << "\n";
+    cout << "Deleted from position " << pos << "!\n";
 }
 
 void deleteByValue(int val) {
@@ -182,14 +217,17 @@ void deleteByValue(int val) {
         cout << "List is empty!\n";
         return;
     }
+    
     Node* p = head;
     while (p && p->data != val) {
         p = p->next;
     }
+    
     if (!p) {
         cout << "Value " << val << " not found!\n";
         return;
     }
+    
     if (p == head) {
         head = head->next;
         if (head) head->prev = NULL;
@@ -197,8 +235,9 @@ void deleteByValue(int val) {
         if (p->prev) p->prev->next = p->next;
         if (p->next) p->next->prev = p->prev;
     }
+    
     delete p;
-    cout << "Deleted value " << val << " \n";
+    cout << "Deleted value " << val << "!\n";
 }
 
 void display() {
@@ -206,6 +245,7 @@ void display() {
         cout << "List is empty!\n";
         return;
     }
+    
     Node* p = head;
     cout << "List: ";
     while (p) {
@@ -226,7 +266,10 @@ void destroy() {
 
 int main() {
     int ch, v, pos, val;
-    cout << " DOUBLY LINKED LIST (C++) \n";
+    clrscr();
+    
+    cout << "     DOUBLY LINKED LIST (C++)         \n";
+    
     do {
         cout << "\n--- INSERT MENU ---\n";
         cout << "[1] Insert at Beginning\n[2] Insert at End\n";
@@ -236,28 +279,86 @@ int main() {
         cout << "[6] Delete at Beginning\n[7] Delete at End\n";
         cout << "[8] Delete at Position\n[9] Delete by Value\n";
         cout << "\n--- DISPLAY MENU ---\n";
-        cout << "[10] Display\n[11] Exit\n";
+        cout << "[10] Display\n";
+        cout << "[11] Exit\n";
         cout << "\nChoice: ";
         cin >> ch;
         
         switch(ch) {
-            case 1: cout << "Value: "; cin >> v; insertAtBegin(v); break;
-            case 2: cout << "Value: "; cin >> v; insertAtEnd(v); break;
-            case 3: cout << "Value: "; cin >> v; cout << "Position: "; cin >> pos; insertAtPosition(v, pos); break;
-            case 4: cout << "Value to insert: "; cin >> v; cout << "After value: "; cin >> val; insertAfterValue(v, val); break;
-            case 5: cout << "Value to insert: "; cin >> v; cout << "Before value: "; cin >> val; insertBeforeValue(v, val); break;
-            case 6: deleteAtBegin(); break;
-            case 7: deleteAtEnd(); break;
-            case 8: cout << "Position: "; cin >> pos; deleteAtPosition(pos); break;
-            case 9: cout << "Value: "; cin >> val; deleteByValue(val); break;
-            case 10: display(); break;
-            case 11: destroy(); cout << "\nExiting...\n"; break;
-            default: cout << "\nInvalid choice!\n";
+            case 1:
+                cout << "Value: ";
+                cin >> v;
+                insertAtBegin(v);
+                break;
+                
+            case 2:
+                cout << "Value: ";
+                cin >> v;
+                insertAtEnd(v);
+                break;
+                
+            case 3:
+                cout << "Value: ";
+                cin >> v;
+                cout << "Position: ";
+                cin >> pos;
+                insertAtPosition(v, pos);
+                break;
+                
+            case 4:
+                cout << "Value to insert: ";
+                cin >> v;
+                cout << "After value: ";
+                cin >> val;
+                insertAfterValue(v, val);
+                break;
+                
+            case 5:
+                cout << "Value to insert: ";
+                cin >> v;
+                cout << "Before value: ";
+                cin >> val;
+                insertBeforeValue(v, val);
+                break;
+                
+            case 6:
+                deleteAtBegin();
+                break;
+                
+            case 7:
+                deleteAtEnd();
+                break;
+                
+            case 8:
+                cout << "Position: ";
+                cin >> pos;
+                deleteAtPosition(pos);
+                break;
+                
+            case 9:
+                cout << "Value: ";
+                cin >> val;
+                deleteByValue(val);
+                break;
+                
+            case 10:
+                display();
+                break;
+                
+            case 11:
+                destroy();
+                cout << "\nExiting...\n";
+                break;
+                
+            default:
+                cout << "\nInvalid choice!\n";
         }
+        
     } while(ch != 11);
     
     return 0;
 }
+
 ```
 
 ## Output
