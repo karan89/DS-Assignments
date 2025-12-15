@@ -9,160 +9,154 @@ c) Cancel an existing booking when requested.
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
 
 struct Seat {
     int seatNum;
-    bool booked;
+    int booked; // 0 for false, 1 for true
     Seat* next;
     Seat* prev;
 };
 
 class Galaxy {
     Seat* head;
-    
-public:
+    Seat* prevNode;
+    public:
     Galaxy() {
         head = NULL;
-        Seat* last = NULL;
-        
-        // Creating a circular doubly linked list for 8 rows * 8 seats = 64 nodes?
-        // OR simpler: The prompt mentions "An array will store head pointers for each row".
-        // However, the provided code in PDF implements a SINGLE list of 64 nodes (8x8).
-        // We will follow the logic provided in the PDF for consistency.
-        
-        for(int i=1; i<=8; i++) {
-            for(int j=1; j<=8; j++) {
+        prevNode = NULL;
+        int i, j;
+        for(i=1; i<=8; i++) {
+            for(j=1;j<=8;j++) {
                 Seat* newSeat = new Seat();
-                newSeat->seatNum = j; // Storing seat column number, row is implicit by structure
-                newSeat->booked = false;
+                newSeat->seatNum = j;
+                newSeat->booked = 0; // false
                 newSeat->next = NULL;
                 newSeat->prev = NULL;
                 
                 if(head == NULL) {
                     head = newSeat;
-                    last = newSeat;
-                } else {
-                    last->next = newSeat;
-                    newSeat->prev = last;
-                    last = newSeat;
+                    prevNode = newSeat;
+                }
+                else {
+                    prevNode->next = newSeat;
+                    newSeat->prev = prevNode;
+                    prevNode = newSeat;
                 }
             }
         }
-        // Make it circular
-        if(last != NULL && head != NULL) {
-            last->next = head;
-            head->prev = last;
-        }
     }
-    
+
     void displaySeats() {
         Seat* temp = head;
-        // We need to iterate 64 times
-        for(int i=1; i<=8; i++) {
-            cout << "Row " << i << ": ";
-            for(int j=1; j<=8; j++) {
+        int i, j;
+        for(i=1;i<=8;i++) {
+            cout<<"Row "<<i<<": ";
+            for(j=1;j<=8;j++) {
                 if(temp->booked) {
-                    cout << "[ X ]";
-                } else {
-                    cout << "[ Y ]";
+                    cout<<"[ X ]";
+                }
+                else {
+                    cout<<"[ Y ]";
                 }
                 temp = temp->next;
             }
-            cout << endl;
+            cout<<endl;
         }
     }
-    
+
     void bookSeat(int row, int seat) {
+        int i;
         if(row < 1 || row > 8 || seat < 1 || seat > 8) {
-            cout << "Invalid row or seat number. Please enter values between 1 and 8.\n";
+            cout<<"Invalid row or seat number. Please enter values between 1 and 8.\n";
             return;
         }
-        
         int index = (row - 1) * 8 + (seat - 1);
         Seat* temp = head;
-        for(int i=0; i<index; i++) {
+        for(i=0;i<index;i++) {
             temp = temp->next;
         }
-        
         if(temp->booked) {
-            cout << "Seat is already booked. Choose another seat.\n";
-        } else {
-            temp->booked = true;
-            cout << "Seat " << seat << " from row " << row << " is booked successfully.\n";
+            cout<<"Seat is already booked. Choose another seat.\n";
+        } 
+        else {
+            temp->booked = 1; // true
+            cout<<"Seat "<<seat<<" from row "<<row<<" is booked successfully.\n";
         }
     }
-    
-    void cancelSeat(int row, int seat) {
+
+    void cancelSeat(int row,int seat) {
+        int i;
+        char ch;
         if(row < 1 || row > 8 || seat < 1 || seat > 8) {
-            cout << "Invalid row or seat number. Please enter values between 1 and 8.\n";
+            cout<<"Invalid row or seat number. Please enter values between 1 and 8.\n";
             return;
         }
-        
         int index = (row - 1) * 8 + (seat - 1);
         Seat* temp = head;
-        for(int i=0; i<index; i++) {
+        for(i=0;i<index;i++) {
             temp = temp->next;
         }
-        
         if(!temp->booked) {
-            cout << "Seat is not yet booked. Do you want to book it? (y/n)\n";
-            char ch;
-            cin >> ch;
-            if(ch == 'y') {
-                temp->booked = true;
-                cout << "Seat " << seat << " from row " << row << " is booked successfully.";
+            cout<<"Seat is not yet booked. Do you want to book it? (y/n)\n";
+            cin>>ch;
+            if(ch=='y') {
+                temp->booked = 1;
+                cout<<"Seat "<<seat<<" from row "<<row<<" is booked successfully.";
             }
-        } else {
-            temp->booked = false;
-            cout << "Seat " << seat << " from row " << row << " is cancelled successfully.";
         }
-        cout << endl;
+        else {
+            temp->booked = 0;
+            cout<<"Seat "<<seat<<" from row "<<row<<" is cancelled successfully.";
+        }
+        cout<<endl;
     }
 };
 
 int main() {
     Galaxy g;
-    int ch, row, seat;
-    
+    int ch,row,seat;
+    clrscr();
+
     do {
-        cout << "\n\tGalaxy Multiplex Ticket System\t\n";
-        cout << "1. Display all seats\n";
-        cout << "2. Book a seat\n";
-        cout << "3. Cancel a seat\n";
-        cout << "4. Exit\n";
-        cout << "Enter your choice: ";
-        cin >> ch;
-        
+        cout<<"\n\tGalaxy Multiplex Ticket System\t\n";
+        cout<<"1. Display all seats\n";
+        cout<<"2. Book a seat\n";
+        cout<<"3. Cancel a seat\n";
+        cout<<"4. Exit\n";
+        cout<<"Enter your choice: ";
+        cin>>ch;
+
         switch (ch) {
-            case 1:
-                g.displaySeats();
-                break;
-            case 2:
-                cout << "Enter Row (1 to 8): ";
-                cin >> row;
-                cout << "Enter Seat (1 to 8): ";
-                cin >> seat;
-                g.bookSeat(row, seat);
-                break;
-            case 3:
-                cout << "Enter Row (1 to 8): ";
-                cin >> row;
-                cout << "Enter Seat (1 to 8): ";
-                cin >> seat;
-                g.cancelSeat(row, seat);
-                break;
-            case 4:
-                cout << "Exiting..\n";
-                break;
-            default:
-                cout << "Invalid choice! Try again.\n";
+        case 1:
+            g.displaySeats();
+            break;
+        case 2:
+            cout<<"Enter Row (1 to 8): ";
+            cin>>row;
+            cout<<"Enter Seat (1 to 8): ";
+            cin>>seat;
+            g.bookSeat(row,seat);
+            break;
+        case 3:
+            cout<<"Enter Row (1 to 8): ";
+            cin>>row;
+            cout<<"Enter Seat (1 to 8): ";
+            cin>>seat;
+            g.cancelSeat(row,seat);
+            break;
+        case 4:
+            cout<<"Exiting..\n";
+            break;
+        default:
+            cout<<"Invalid choice! Try again.\n";
         }
-    } while(ch != 4);
-    
+    } while(ch!= 4);
+
     return 0;
 }
+
 ```
 
 ## Output
