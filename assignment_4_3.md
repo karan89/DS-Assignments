@@ -6,30 +6,30 @@ Implement Bubble sort using Doubly Linked List.
 ## Code
 
 ```cpp
-#include<iostream>
-using namespace std;
+#include<iostream.h>
+#include<conio.h>
 
 struct Node {
     int data;
     Node* prev;
     Node* next;
-    
-    Node(int d, Node* p, Node* n) : data(d), prev(p), next(n) {}
 };
 
 Node* head = NULL;
 
 void insert(int v) {
-    Node* t = new Node(v, NULL, NULL);
+    Node* t = new Node;
+    t->data = v;
+    t->prev = NULL;
+    t->next = NULL;
+
     if (!head) {
         head = t;
         cout << "Inserted!\n";
         return;
     }
-    
     Node* p = head;
     while (p->next) p = p->next;
-    
     p->next = t;
     t->prev = p;
     cout << "Inserted!\n";
@@ -38,18 +38,23 @@ void insert(int v) {
 void bubbleSort() {
     if (!head || !head->next) return;
     
-    bool swapped;
+    int swapped; // used as boolean
     Node* p;
     Node* last = NULL;
-    
+    int tempVal;
+
     do {
-        swapped = false;
+        swapped = 0;
         p = head;
-        
+
         while (p->next != last) {
             if (p->data > p->next->data) {
-                swap(p->data, p->next->data);
-                swapped = true;
+                // Manual swap
+                tempVal = p->data;
+                p->data = p->next->data;
+                p->next->data = tempVal;
+                
+                swapped = 1;
             }
             p = p->next;
         }
@@ -80,37 +85,44 @@ void destroy() {
 
 int main() {
     int ch, v;
-    cout << " BUBBLE SORT USING DLL (C++) \n";
+    clrscr();
     
+    cout << "   BUBBLE SORT USING DLL (C++)        \n";
+
     do {
         cout << "\n[1] Insert\n[2] Sort (Bubble)\n[3] Display\n[4] Exit\nChoice: ";
         cin >> ch;
-        
+
         switch(ch) {
             case 1:
                 cout << "Value: ";
                 cin >> v;
                 insert(v);
                 break;
+
             case 2:
                 bubbleSort();
                 cout << "Sorted!\n";
                 break;
+
             case 3:
                 cout << "List: ";
                 display();
                 break;
+                
             case 4:
                 destroy();
                 cout << "Exiting...\n";
                 break;
+                
             default:
                 cout << "Invalid choice!\n";
         }
     } while(ch != 4);
-    
+
     return 0;
 }
+
 ```
 
 ## Output
