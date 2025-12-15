@@ -12,23 +12,26 @@ c) Display the number of students who like neither Cricket nor Football.
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
+#include <string.h>
 
 struct CricketNode {
-    string sname;
+    char sname[20];
     CricketNode* next;
-    CricketNode(string nm) {
-        sname = nm;
+
+    CricketNode(char nm[]) {
+        strcpy(sname, nm);
         next = NULL;
     }
 };
 
 struct FootballNode {
-    string sname;
+    char sname[20];
     FootballNode* next;
-    FootballNode(string nm) {
-        sname = nm;
+
+    FootballNode(char nm[]) {
+        strcpy(sname, nm);
         next = NULL;
     }
 };
@@ -36,14 +39,14 @@ struct FootballNode {
 class VITCollege {
     CricketNode* head1;
     FootballNode* head2;
-    
+
 public:
     VITCollege() {
         head1 = NULL;
         head2 = NULL;
     }
-    
-    void insertCricket(string name) {
+
+    void insertCricket(char name[]) {
         CricketNode* newNode = new CricketNode(name);
         if (!head1) {
             head1 = newNode;
@@ -53,8 +56,8 @@ public:
         while (temp->next) temp = temp->next;
         temp->next = newNode;
     }
-    
-    void insertFootball(string name) {
+
+    void insertFootball(char name[]) {
         FootballNode* newNode = new FootballNode(name);
         if (!head2) {
             head2 = newNode;
@@ -64,117 +67,114 @@ public:
         while (temp->next) temp = temp->next;
         temp->next = newNode;
     }
-    
+
     // Helper: check if name in Cricket list
-    bool inCricket(string name) {
+    int inCricket(char name[]) {
         CricketNode* t = head1;
         while (t) {
-            if (t->sname == name) return true;
+            if (strcmp(t->sname, name) == 0) return 1;
             t = t->next;
         }
-        return false;
+        return 0;
     }
-    
+
     // Helper: check if name in Football list
-    bool inFootball(string name) {
+    int inFootball(char name[]) {
         FootballNode* t = head2;
         while (t) {
-            if (t->sname == name) return true;
+            if (strcmp(t->sname, name) == 0) return 1;
             t = t->next;
         }
-        return false;
+        return 0;
     }
-    
+
     void bothCriFoot() {
         cout << "\n\tStudents who like BOTH Cricket and Football:\n";
-        bool found = false;
+        int found = 0;
+
         CricketNode* c = head1;
         while (c) {
             if (inFootball(c->sname)) {
-                cout << " " << c->sname << endl;
-                found = true;
+                cout << "  " << c->sname << endl;
+                found = 1;
             }
             c = c->next;
         }
-        if (!found) cout << " None\n";
+
+        if (!found) cout << "  None\n";
     }
-    
+
     void eitherButNotBoth() {
         cout << "\n\tStudents who like EITHER Cricket or Football BUT NOT BOTH:\n";
-        bool found = false;
-        
-        // In Cricket but not Football
+        int found = 0;
+
         CricketNode* c = head1;
         while (c) {
             if (!inFootball(c->sname)) {
-                cout << " " << c->sname << endl;
-                found = true;
+                cout << "  " << c->sname << endl;
+                found = 1;
             }
             c = c->next;
         }
-        
-        // In Football but not Cricket
+
         FootballNode* f = head2;
         while (f) {
             if (!inCricket(f->sname)) {
-                cout << " " << f->sname << endl;
-                found = true;
+                cout << "  " << f->sname << endl;
+                found = 1;
             }
             f = f->next;
         }
-        
-        if (!found) cout << " None\n";
+
+        if (!found) cout << "  None\n";
     }
-    
+
     void neither(int total) {
         cout << "\n\tStudents who like NEITHER Cricket nor Football:\n";
-        string name;
-        bool found = false;
-        
-        // In a real scenario, we would have a universal set list.
-        // Here we simulate checking against the total students by inputting names.
-        cout << "(Checking for " << total << " students...)\n";
-        
-        // Note: The logic in PDF implies entering names manually to check.
-        // This loop runs 'total' times.
-        for (int i=0; i < total; i++) {
-            cout << "Enter student name to check: ";
+
+        char name[20];
+        int found = 0;
+        int i;
+
+        for (i = 0; i < total; i++) {
+            cout << "Enter student name: ";
             cin >> name;
-            
+
             if (!inCricket(name) && !inFootball(name)) {
-                cout << " -> " << name << " likes neither." << endl;
-                found = true;
+                cout << "  " << name << endl;
+                found = 1;
             }
         }
-        
-        if (!found) cout << " None found in the checked names.\n";
+
+        if (!found) cout << "  None\n";
     }
 };
 
 int main() {
     VITCollege clg;
-    int total, n, ch;
-    string name;
-    
-    cout << "Enter total number of students in class: ";
+    int total, n, ch, i;
+    char name[20];
+    clrscr();
+
+    cout << "Enter total number of students: ";
     cin >> total;
-    
+
     cout << "\nEnter number of students who like Cricket: ";
     cin >> n;
-    cout << "Enter names: \n";
-    for (int i=0; i<n; i++) {
+    cout << "Enter names:\n";
+    for (i = 0; i < n; i++) {
         cin >> name;
         clg.insertCricket(name);
     }
-    
+
     cout << "\nEnter number of students who like Football: ";
     cin >> n;
-    cout << "Enter names: \n";
-    for (int i=0; i<n; i++) {
+    cout << "Enter names:\n";
+    for (i = 0; i < n; i++) {
         cin >> name;
         clg.insertFootball(name);
     }
-    
+
     do {
         cout << "\n\n=== Sports Preference Menu ===\n";
         cout << "1. Students who like BOTH Cricket and Football\n";
@@ -183,18 +183,28 @@ int main() {
         cout << "4. Exit\n";
         cout << "Enter choice: ";
         cin >> ch;
-        
+
         switch (ch) {
-            case 1: clg.bothCriFoot(); break;
-            case 2: clg.eitherButNotBoth(); break;
-            case 3: clg.neither(total); break;
-            case 4: cout << "Exiting...\n"; break;
-            default: cout << "Invalid choice. Please try again.\n";
+            case 1:
+                clg.bothCriFoot();
+                break;
+            case 2:
+                clg.eitherButNotBoth();
+                break;
+            case 3:
+                clg.neither(total);
+                break;
+            case 4:
+                cout << "Exiting...\n";
+                break;
+            default:
+                cout << "Invalid choice. Please try again.\n";
         }
     } while (ch != 4);
-    
+
     return 0;
 }
+
 ```
 
 ## Output
