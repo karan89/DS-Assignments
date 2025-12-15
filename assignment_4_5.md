@@ -6,20 +6,21 @@ Given a list, split it into two sublists one for the front half, and one for the
 ## Code
 
 ```cpp
-#include<iostream>
-using namespace std;
+#include<iostream.h>
+#include<conio.h>
 
 struct Node {
     int data;
     Node* next;
-    
-    Node(int d) : data(d), next(NULL) {}
 };
 
 Node* head = NULL;
 
 void insert(int v) {
-    Node* t = new Node(v);
+    Node* t = new Node;
+    t->data = v;
+    t->next = NULL;
+
     if (!head) {
         head = t;
         cout << "Inserted!\n";
@@ -55,6 +56,7 @@ int getLength(Node* h) {
 }
 
 void frontBackSplit(Node* source, Node** front, Node** back) {
+    int i;
     if (!source) {
         *front = NULL;
         *back = NULL;
@@ -71,7 +73,7 @@ void frontBackSplit(Node* source, Node** front, Node** back) {
     int frontLen = (len + 1) / 2;
     
     Node* current = source;
-    for (int i = 1; i < frontLen; i++) {
+    for (i = 1; i < frontLen; i++) {
         current = current->next;
     }
     
@@ -91,8 +93,9 @@ void destroy(Node* h) {
 int main() {
     int ch, v;
     Node *front = NULL, *back = NULL;
+    clrscr();
     
-    cout << " FRONT-BACK SPLIT (C++) \n";
+    cout << "      FRONT-BACK SPLIT (C++)          \n";
     
     do {
         cout << "\n[1] Insert Element\n[2] Display List\n";
@@ -102,44 +105,65 @@ int main() {
         
         switch(ch) {
             case 1:
-                cout << "Value: "; cin >> v; insert(v); break;
+                cout << "Value: ";
+                cin >> v;
+                insert(v);
+                break;
+                
             case 2:
-                cout << "\nCurrent List: "; display(head); cout << "\n"; break;
+                cout << "\nCurrent List: ";
+                display(head);
+                cout << "\n";
+                break;
+                
             case 3:
                 if (!head) {
                     cout << "\nList is empty! Insert elements first.\n";
                     break;
                 }
+                
                 if (front) destroy(front);
                 if (back) destroy(back);
                 
-                cout << "\nOriginal List: "; display(head); cout << "\n";
+                cout << "\nOriginal List: ";
+                display(head);
+                cout << "\n";
                 
-                // Pass addresses of the front and back pointers
                 frontBackSplit(head, &front, &back);
-                head = NULL; // Source list is now consumed/split
+                head = NULL;
                 
                 cout << "\nSplit Complete!\n";
-                cout << "Front Half : "; display(front);
-                cout << "\nBack Half  : "; display(back);
+                cout << "Front Half   : ";
+                display(front);
+                cout << "\nBack Half    : ";
+                display(back);
                 cout << "\n";
                 break;
+                
             case 4:
-                destroy(head); destroy(front); destroy(back);
+                destroy(head);
+                destroy(front);
+                destroy(back);
                 head = front = back = NULL;
                 cout << "\nList cleared!\n";
                 break;
+                
             case 5:
-                destroy(head); destroy(front); destroy(back);
+                destroy(head);
+                destroy(front);
+                destroy(back);
                 cout << "\nExiting...\n";
                 break;
+                
             default:
                 cout << "\nInvalid choice!\n";
         }
+        
     } while(ch != 5);
     
     return 0;
 }
+
 ```
 
 ## Output
