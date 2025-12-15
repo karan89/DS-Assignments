@@ -123,6 +123,7 @@ void main()
 
     } while (ch != 6);
 }
+
 ```
 
 ## Output
