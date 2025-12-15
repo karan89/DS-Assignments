@@ -8,23 +8,30 @@ Store this structure using a Generalized Linked List and display the elements in
 ## Code
 
 ```cpp
-#include <iostream>
-#include <string>
-using namespace std;
+#include <iostream.h>
+#include <conio.h>
+#include <string.h>
 
 struct GLL {
-    int flag; // 0 for atom, 1 for sublist
-    string data;
+    int flag;      // 0 for atom, 1 for sublist
+    char data[20]; // Changed string to char array
     GLL* next;
     GLL* down;
-    
-    GLL() : flag(0), data(""), next(NULL), down(NULL) {}
 };
+
+// Function to create a new GLL node manually since no constructor
+GLL* allocateNode() {
+    GLL* node = new GLL;
+    node->flag = 0;
+    node->next = NULL;
+    node->down = NULL;
+    return node;
+}
 
 GLL* create(); // Forward declaration
 
 GLL* createAtom() {
-    GLL* node = new GLL();
+    GLL* node = allocateNode();
     node->flag = 0;
     cout << "Enter atom: ";
     cin >> node->data;
@@ -33,28 +40,27 @@ GLL* createAtom() {
 }
 
 GLL* createSublist() {
-    GLL* node = new GLL();
+    GLL* node = allocateNode();
     node->flag = 1;
-    node->data = "";
+    strcpy(node->data, ""); 
     cout << "-> Creating sublist:\n";
     return node;
 }
 
 GLL* create() {
     int choice;
-    cout << "\n[0] Atom [1] Sublist [2] Stop\nChoice: ";
+    cout << "\n[0] Atom  [1] Sublist  [2] Stop\nChoice: ";
     cin >> choice;
     
     if (choice == 2) return NULL;
     
     GLL* node = NULL;
-    
     if (choice == 0) {
         node = createAtom();
     } else if (choice == 1) {
         node = createSublist();
         node->down = create();
-        cout << "< Back to parent level\n";
+        cout << "<- Back to parent level\n";
     } else {
         cout << "Invalid! Try again.\n";
         return create();
@@ -71,7 +77,7 @@ void display(GLL* head) {
             cout << head->data;
         else
             display(head->down);
-            
+        
         if (head->next) cout << ", ";
         head = head->next;
     }
@@ -91,8 +97,9 @@ void destroy(GLL* head) {
 int main() {
     int choice;
     GLL* head = NULL;
+    clrscr();
     
-    cout << "SET IMPLEMENTATION USING GLL (C++) \n";
+    cout << "SET IMPLEMENTATION USING GLL (C++)  \n";
     
     do {
         cout << "\n[1] Create Set\n[2] Display Set\n[3] Exit\nChoice: ";
@@ -124,10 +131,12 @@ int main() {
             default:
                 cout << "\nInvalid choice! Try again.\n";
         }
+        
     } while(choice != 3);
     
     return 0;
 }
+
 ```
 
 ## Output
