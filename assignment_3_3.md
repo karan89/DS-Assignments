@@ -11,241 +11,267 @@ e) Sort the list based on appointment times using pointer manipulation (without 
 ## Code
 
 ```cpp
-#include<iostream>
-using namespace std;
-
+#include<iostream.h>
+#include<conio.h>
+#include<stdlib.h>
 struct Node {
-    int start;
-    int end;
+    int start; 
+    int end;   
     Node* next;
-    
-    Node(int s, int e) {
+
+    Node(int s, int e)  {
         start = s;
         end = e;
-        next = nullptr;
+        next = NULL;
     }
 };
 
 class AppointmentList {
     Node* head;
     int dayStart, dayEnd, minDur, maxDur;
-    
+
 public:
     AppointmentList(int ds, int de, int minD, int maxD) {
-        head = nullptr;
+        head = NULL;
         dayStart = ds;
         dayEnd = de;
         minDur = minD;
         maxDur = maxD;
     }
-    
+
     void printTime(int t) {
         int h = t / 60;
         int m = t % 60;
-        cout << h << ":" << (m < 10 ? "0" : "") << m;
+        cout<<h<<" : "<<m;
     }
-    
+
     void displayAppointments() {
         if(!head) {
-            cout << "\nNo appointments booked.\n";
+            cout<<"\nNo appointments booked.\n";
             return;
         }
-        cout << "\n--- Booked Appointments ---\n";
+        cout<<"\n--- Booked Appointments ---\n";
         Node* temp = head;
         while(temp) {
             printTime(temp->start);
-            cout << " - ";
+            cout<<" - ";
             printTime(temp->end);
-            cout << endl;
+            cout<<endl;
             temp = temp->next;
         }
     }
-    
+
     void displayAvailableSlots() {
-        cout << "\n--- Available Time Slots ---\n";
+        cout<<"\n--- Available Time Slots ---\n";
         if(!head) {
             printTime(dayStart);
-            cout << " - ";
+            cout<<" - ";
             printTime(dayEnd);
-            cout << endl;
+            cout<<endl;
             return;
         }
-        
         Node* temp = head;
         int prevEnd = dayStart;
-        
+
         while(temp) {
             if(temp->start > prevEnd) {
                 printTime(prevEnd);
-                cout << " - ";
+                cout<<" - ";
                 printTime(temp->start);
-                cout << endl;
+                cout<<endl;
             }
             prevEnd = temp->end;
             temp = temp->next;
         }
-        
-        if (prevEnd < dayEnd) {
+
+        if(prevEnd < dayEnd) {
             printTime(prevEnd);
-            cout << " - ";
+            cout<<" - ";
             printTime(dayEnd);
-            cout << endl;
+            cout<<endl;
         }
     }
-    
-    bool isAvailable(int s, int e) {
+
+    // Using int as bool
+    int isAvailable(int s, int e) {
         if(s < dayStart || e > dayEnd || s >= e)
-            return false;
-            
+            return 0; // false
+
         Node* temp = head;
         while(temp) {
-            // Check for overlap
             if(!(e <= temp->start || s >= temp->end))
-                return false;
+                return 0; // false
             temp = temp->next;
         }
-        return true;
+        return 1; // true
     }
-    
+
     void bookAppointment() {
         int sh, sm, eh, em;
-        cout << "Enter start time (HH MM): ";
-        cin >> sh >> sm;
-        cout << "Enter end time (HH MM): ";
-        cin >> eh >> em;
-        
+        cout<<"Enter start time (HH MM): ";
+        cin>>sh>>sm;
+        cout<<"Enter end time (HH MM): ";
+        cin>>eh>>em;
+
         int start = sh * 60 + sm;
         int end = eh * 60 + em;
         int duration = end - start;
-        
+
         if(duration < minDur || duration > maxDur) {
-            cout << "Duration must be between " << minDur << " and " << maxDur << " minutes.\n";
+            cout<<"Duration must be between "<<minDur<<" and "<<maxDur<<" minutes.\n";
             return;
         }
-        
+
         if(!isAvailable(start, end)) {
-            cout << "Time slot not available or already booked.\n";
+            cout<<"Time slot not available or already booked.\n";
             return;
         }
-        
+
         Node* newNode = new Node(start, end);
-        
-        if (!head || start < head->start) {
+
+        if(!head || start < head->start) {
             newNode->next = head;
             head = newNode;
-        } else {
+        }
+        else {
             Node* temp = head;
             while (temp->next && temp->next->start < start)
                 temp = temp->next;
-                
             newNode->next = temp->next;
             temp->next = newNode;
         }
-        cout << "Appointment booked successfully!\n";
+
+        cout<<"Appointment booked successfully!\n";
     }
-    
+
     void cancelAppointment() {
         if(!head) {
-            cout << "No appointments to cancel.\n";
+            cout<<"No appointments to cancel.\n";
             return;
         }
-        
+
         int h, m;
-        cout << "Enter start time (HH MM) of appointment to cancel: ";
-        cin >> h >> m;
+        cout<<"Enter start time (HH MM) of appointment to cancel: ";
+        cin>>h>>m;
         int t = h * 60 + m;
-        
+
         Node* temp = head;
-        Node* prev = nullptr;
-        
+        Node* prev = NULL;
+
         while(temp && temp->start != t) {
             prev = temp;
             temp = temp->next;
         }
-        
+
         if(!temp) {
-            cout << "Appointment not found.\n";
+            cout<<"Appointment not found.\n";
             return;
         }
-        
+
         if(!prev)
             head = temp->next;
         else
             prev->next = temp->next;
-            
+
         delete temp;
-        cout << "Appointment cancelled.\n";
+        cout<<"Appointment cancelled.\n";
     }
-    
+
     void sortByData() {
-        if (!head) return;
-        for (Node* i = head; i; i = i->next)
-            for(Node* j = i->next; j; j = j->next)
+        if(!head) return;
+        Node* i;
+        Node* j;
+        int tStart, tEnd;
+        
+        for(i = head; i != NULL; i = i->next) {
+            for(j = i->next; j != NULL; j = j->next) {
                 if(i->start > j->start) {
-                    swap(i->start, j->start);
-                    swap(i->end, j->end);
+                    // swap start
+                    tStart = i->start;
+                    i->start = j->start;
+                    j->start = tStart;
+                    // swap end
+                    tEnd = i->end;
+                    i->end = j->end;
+                    j->end = tEnd;
                 }
-        cout << "Sorted by swapping data values.\n";
-    }
-    
-    void sortByPointer() {
-        if(!head || !head->next) return;
-        
-        Node* sorted = nullptr;
-        Node* current = head;
-        
-        while(current) {
-            Node* next = current->next;
-            
-            if(!sorted || current->start < sorted->start) {
-                current->next = sorted;
-                sorted = current;
-            } else {
-                Node* temp = sorted;
-                while (temp->next && temp->next->start < current->start)
-                    temp = temp->next;
-                    
-                current->next = temp->next;
-                temp->next = current;
             }
-            current = next;
+        }
+        cout<<"Sorted by swapping data values.\n";
+    }
+
+    void sortByPointer() {
+        if(!head || !head->next) 
+            return;
+
+        Node* sorted = NULL;
+
+        while(head) {
+            Node* curr = head;
+            head = head->next;
+
+            if(!sorted || curr->start < sorted->start) {
+                curr->next = sorted;
+                sorted = curr;
+            } 
+            else {
+                Node* temp = sorted;
+                while (temp->next && temp->next->start < curr->start)
+                    temp = temp->next;
+                curr->next = temp->next;
+                temp->next = curr;
+            }
         }
         head = sorted;
-        cout << "Sorted by pointer manipulation.\n";
+        cout<<"Sorted by pointer manipulation.\n";
     }
 };
 
 int main() {
-    // 9:00 to 17:00, min 30 mins, max 90 mins
     AppointmentList scheduler(9 * 60, 17 * 60, 30, 90);
     int ch;
-    
-    do {
-        cout << "\n\n=== Appointment Scheduler ===\n";
-        cout << "1. Display Available Slots\n";
-        cout << "2. Book Appointment\n";
-        cout << "3. Cancel Appointment\n";
-        cout << "4. Sort by Data\n";
-        cout << "5. Sort by Pointers\n";
-        cout << "6. Display All Appointments\n";
-        cout << "7. Exit\n";
-        cout << "Enter choice: ";
-        cin >> ch;
-        
+    clrscr();
+
+    do{
+        cout<<"\n\n=== Appointment Scheduler ===\n";
+        cout<<"1. Display Available Slots\n";
+        cout<<"2. Book Appointment\n";
+        cout<<"3. Cancel Appointment\n";
+        cout<<"4. Sort by Data\n";
+        cout<<"5. Sort by Pointers\n";
+        cout<<"6. Display All Appointments\n";
+        cout<<"7. Exit\n";
+        cout<<"Enter choice: ";
+        cin>>ch;
         switch(ch) {
-            case 1: scheduler.displayAvailableSlots(); break;
-            case 2: scheduler.bookAppointment(); break;
-            case 3: scheduler.cancelAppointment(); break;
-            case 4: scheduler.sortByData(); break;
-            case 5: scheduler.sortByPointer(); break;
-            case 6: scheduler.displayAppointments(); break;
-            case 7: exit(0); break;
-            default: cout << "Invalid Choice. Select choice from menu. \n";
+            case 1:
+                scheduler.displayAvailableSlots();
+                break;
+            case 2:
+                scheduler.bookAppointment();
+                break;
+            case 3: 
+                scheduler.cancelAppointment(); 
+                break;
+            case 4: 
+                scheduler.sortByData(); 
+                break;
+            case 5: 
+                scheduler.sortByPointer(); 
+                break;
+            case 6: 
+                scheduler.displayAppointments(); 
+                break;
+            case 7: 
+                exit(0); 
+                break;
+            default:
+                cout<<"Invalid Choice. Select choice from menu.\n";
         }
-    } while(ch != 7);
-    
+    } while(ch!=7);
     return 0;
 }
+
 ```
 
 ## Output
