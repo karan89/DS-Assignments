@@ -6,8 +6,8 @@ Write a program using Bubble sort algorithm, assign the roll nos. to the student
 ## Code
 
 ```cpp
-#include <iostream>
-using namespace std;
+#include<iostream.h>
+#include<conio.h>
 
 struct Student {
     int student_roll_no;
@@ -15,42 +15,50 @@ struct Student {
 };
 
 void bubble_sort(Student arr[], int n) {
-    for(int i=0; i<n-1; i++) {
-        for(int j=0; j<n-i-1; j++) {
-            // Sort in descending order of marks
+    int i, j;
+    for(i=0; i<n-1; i++) {
+        for(j=0; j<n-i-1; j++) {
             if(arr[j].total_marks < arr[j+1].total_marks) {
-                swap(arr[j], arr[j+1]);
+                // Manual swap
+                Student temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
             }
         }
     }
 }
 
 int main() {
-    int n;
-    cout << "Enter number of students: ";
-    cin >> n;
+    int n, i;
+    Student arr[50]; // Fixed size
     
-    Student arr[n];
-    for(int i=0; i<n; i++) {
-        cout << "Enter totalmarks for student " << i+1 << ": ";
-        cin >> arr[i].total_marks;
+    clrscr();
+
+    cout<<"Enter number of students: ";
+    cin>>n;
+    
+    for(i=0; i<n; i++) {
+        cout<<"Enter totalmarks for student "<<i+1<<": ";
+        cin>>arr[i].total_marks;
     }
     
     bubble_sort(arr, n);
     
-    // Assign roll numbers based on rank
-    for(int i=0; i<n; i++) {
-        arr[i].student_roll_no = i + 1;
+    // Assign roll numbers based on sorted rank
+    for(i=0; i<n; i++) {
+        arr[i].student_roll_no = i+1;
     }
     
-    cout << "\nStudents details: \n";
-    cout << "Roll no.\tMarks\n";
-    for(int i=0; i<n; i++) {
-        cout << "\t" << arr[i].student_roll_no << "\t" << arr[i].total_marks << endl;
+    cout<<"\nStudents details: \n";
+    cout<<"Roll no.     Marks\n";
+    for(i=0; i<n; i++) {
+        cout<<" "<<arr[i].student_roll_no<<"            "<<arr[i].total_marks<<endl;
     }
     
+    getch();
     return 0;
 }
+
 ```
 
 ## Output
